@@ -1,0 +1,74 @@
+9
+
+dir
+9
+file:///home/sergey/WORK/working_copies/Rapsodia/REPOS_Rapsodia/libraps/trunk
+file:///home/sergey/WORK/working_copies/Rapsodia/REPOS_Rapsodia/libraps/trunk
+
+
+
+2010-06-04T06:23:08.039394Z
+9
+sergey
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+cc000780-e508-473e-b1d1-6f7dcefc88af
+
+include
+dir
+
+lib
+dir
+
+src
+dir
+
+obj
+dir
+
+Makefile
+file
+
+
+
+
+2010-06-22T06:18:06.000000Z
+64fd7c6a4cadf41218fa4eda65789e11
+2009-09-07T07:21:37.114759Z
+1
+sergey
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+953
+

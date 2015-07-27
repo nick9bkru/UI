@@ -1,0 +1,29 @@
+#ifndef INTERFACESET_H
+#define INTERFACESET_H
+
+#include <vector>
+#include <pthread.h>
+
+#include "DataInterface.h"
+
+namespace SKLib
+{
+     class InterfaceSet
+	  {
+	  public:
+	       InterfaceSet();
+	       virtual ~InterfaceSet();
+	       
+	       virtual DataInterface *getInterfaceForApp(int num, int code, bool isFreq = false) = 0;
+	       void add(DataInterface *ai);
+	       void start() const;
+	       void setLog(Log * _log);
+	       
+	  protected:
+	       static std::vector<DataInterface *> vec;
+	       static void* pthreadFunc(void*);
+	       static void openAll();
+	  };
+}
+
+#endif // INTERFACESET_H

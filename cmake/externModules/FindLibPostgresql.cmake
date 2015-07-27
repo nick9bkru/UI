@@ -1,0 +1,8 @@
+include(FindPackageHandleStandardArgs)
+if(LIB_POSTGRESQL_INCLUDE_DIR AND LIB_POSTGRESQL_LIBRARIES)
+   set(LibPostgresql_FIND_QUIETLY TRUE)
+endif(LIB_POSTGRESQL_INCLUDE_DIR AND LIB_POSTGRESQL_LIBRARIES)
+find_path(LIB_POSTGRESQL_INCLUDE_DIR libpq-fe.h HINTS /usr/include/pgsql /usr/include/postgresql /opt/local/include/postgresql83)
+find_library(LIB_POSTGRESQL_LIBRARIES libpq.so libpq.dylib HINTS /usr/lib/ /opt/local/lib/postgresql83)
+find_package_handle_standard_args(LibPostgresql DEFAULT_MSG LIB_POSTGRESQL_LIBRARIES LIB_POSTGRESQL_INCLUDE_DIR)
+mark_as_advanced(LIB_POSTGRESQL_LIBRARIES)
