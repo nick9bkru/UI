@@ -109,7 +109,7 @@ bool UiTcp::recieveState()
     
   memcpy( &buf, &(b[1]), 2 );
   buf = (~buf) & 0xFFFF;
-//   std::cout << " buf == " << buf << std::endl;
+ //  std::cout << " buf == " << buf << std::endl;
   buf &= maskPin;
 //   std::cout << " buf == " << buf << std::endl;
   if ( lastState != buf)

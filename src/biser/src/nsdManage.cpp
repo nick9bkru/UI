@@ -27,6 +27,8 @@ void nsdManage::init()
 {
 
   cleaVecDcm();
+//   Dcm.push_back( new DcmNsd( "192.168.1.122", 50000, BDNsd) );
+  
   BDReadConf *ConfRead =  new BDReadConf ( db ) ;
   
   BDReadConf::vecIp UI = ConfRead->getUiIp( UiTcp::UIUPS );

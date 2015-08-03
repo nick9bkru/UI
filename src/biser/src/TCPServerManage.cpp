@@ -31,7 +31,7 @@ void TCPServerManage::start()
   socklen_t sin_size = sizeof(their_addr);
 
   fd_set rfds;
-  struct timeval tv = {0 , 10000};
+  struct timeval tv = {1 , 0};
   int retval = -1 ;
     
   while ( IsWork )
@@ -50,7 +50,7 @@ void TCPServerManage::start()
       connect( new_fd, std::string (inet_ntoa (their_addr.sin_addr)));
     };
 //     std::cout << " !!! === " << strerror(errno) << " !!!" << std::endl;
-    sleep( 1) ;
+   // sleep( 1) ;
   };
 }
 
