@@ -53,6 +53,15 @@ int TCPSocketInterface::open(const std::string & ipAddr)
 
 int TCPSocketInterface::getAnswerForCommand(const std::string & cmdString, void *answer, int size)
 {
+   int sz;
+     ioctl(getFd(), SIOCINQ, &sz);
+     if (sz > 20)
+     {
+	  char buf[sz];
+	  recv(getFd(), &buf, sz, MSG_DONTWAIT);
+//	  log.log("sz = " + LexicalCaster(sz));
+     }
+     
      if ( onlySend ( cmdString ) < 0 )
 	  return -2;
 
@@ -77,39 +86,14 @@ int TCPSocketInterface::getAnswerForCommand_new(const std::string & cmdString, v
      }
 
      // Send message.
-     int ret;
      for( int i=0; i<3; i++)
-     { ret = send(getFd(), cmdString.c_str(), cmdString.size(), 0);
-       if (ret == -1)
-       {
-     	  setErrMsg("send()");
-
-	  if (errno == EPIPE)
-	  {
-	       log.log("EPIPE in send()");
-	       this->close();
-	  }
-	  
+     { 
+       if ( onlySend ( cmdString ) < 0 )
 	  return -1;
-       }
        usleep(getTimeout());
      } 
-     // Receive answer.
-     ret = recv(getFd(), answer, size, MSG_DONTWAIT);
-     if (ret == -1)
-     {
-	  setErrMsg("recv()");
-
-	  if (errno == EPIPE)
-	  {
-	       log.log("EPIPE in recv()");
-	       this->close();
-	  }
-	  
-	  return -1;
-     }
-
-     return ret;
+    
+    return onlyRead ( answer, size );
 }
 
 

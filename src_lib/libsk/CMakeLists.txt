@@ -20,6 +20,7 @@ ${HEADERS_DIRECTORY}/DataInterface.h
 ${HEADERS_DIRECTORY}/InterfaceSet.h
 ${HEADERS_DIRECTORY}/DeviceInterface.h
 ${HEADERS_DIRECTORY}/Log.h 
+${HEADERS_DIRECTORY}/LogSingleton.h 
 ${HEADERS_DIRECTORY}/TCPSocketInterface.h
 ${HEADERS_DIRECTORY}/util.h
 ${HEADERS_DIRECTORY}/PMutexLocker.h

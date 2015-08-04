@@ -4,7 +4,7 @@
 using namespace UIservice ;
 
 TCPManage::TCPManage() 
-{
+{ 
 //    std::cout << "Constructor TCPManage::TCPManage() !!!!! " << std::endl;
    AllUi.clear();
 }

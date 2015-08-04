@@ -23,7 +23,7 @@
 
 #include "TCPServerManage.h"
 
-
+#include "LogSingleton.h"
 
 /// Экземпляр класса для журналирования.
 SKLib::Log log;
@@ -106,6 +106,8 @@ int main(int argc, char **argv)
       daemon(0, 0);
      mainThreadPid = getpid();
 
+     
+//       SKLib::LogSingleton::getInstance().log() << " 12" ;
      log.setDebugMode(argc > 1 ? SKLib::Log::DebugToUserScreen : SKLib::Log::DebugToFile);
      
      try 
@@ -138,7 +140,7 @@ int main(int argc, char **argv)
      
      struct sa_info foo;
      SKLib::DataInterface * iface;
-      std::string  ip;
+      std::string  ip = "";
      UiTcpArp *ifaceDcm;
      try
      {
@@ -157,12 +159,13 @@ int main(int argc, char **argv)
 	      case Serdolik:
 		
 		if ( !db->getUiIp( &ip, foo.num ))
-		  throw ( "Dont't find ip = " + ip);
+		  throw ( "Dont't find foo.num =  " + LexicalCaster(foo.num));
 		ifaceDcm  = new UiTcpArp (ip) ;
 		TcpManage->addUi( ifaceDcm );
 		
 		apparate[foo.num] = new serdolik(foo, ifaceDcm);
 		apparate[foo.num]->isOn=true;
+		break;
 	      default:
 		throw ( std::string (" Don't know apparate type") + LexicalCaster(foo.type) );
 	    }
@@ -170,7 +173,7 @@ int main(int argc, char **argv)
      }
      catch ( std::string e)
      {
-       log.log() << "1 ERROR :::: "<< e ;
+       log.log() << "!!! ERROR :::: "<< e ;
       return -1; 
      }
      pthread_create(&pthread[0], NULL, pthreadReceiver, NULL);
@@ -204,43 +207,44 @@ void* pthreadReceiver(void *unused)
 
      while (1)
      {
-   ret = listen(sockfd, 50);
-   if (ret == -1)
-   {
-        log.log("listen(): " + std::string(strerror(errno)));
-        continue;
-   }
+	ret = listen(sockfd, 50);
+	if (ret == -1)
+	{
+	      log.log("listen(): " + std::string(strerror(errno)));
+	      continue;
+	}
 
-   sock_new = accept(sockfd, NULL, NULL);
-   if (sock_new == -1)
-   {
-        log.log("accept(): " + std::string(strerror(errno)));
-        continue;
-   }
-   
- //  len = recv(sock_new, &buf, sizeof(struct kg), 0);
- //  close(sock_new);
-   while( (len=recv(sock_new, &buf, sizeof(struct kg), 0)) >0 )
-   { 
-   if (len == sizeof(struct kg))
-   {  log.log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
-        
-        if (buf.number >= 1 && buf.number <= 48)
-        {
-	   if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
-	   { 
-               apparate[buf.number]->checkNewMessage(buf);
-               apparate[buf.number]->setPrio(1);
-	   } else  
-	    {
-		   log.log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
-		   reSetInterfece(buf);
-	   }
-    //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
-        }
-        else
-      log.log("ERROR: buf.number = " + LexicalCaster(buf.number));
-   }
+	sock_new = accept(sockfd, NULL, NULL);
+	if (sock_new == -1)
+	{
+	      log.log("accept(): " + std::string(strerror(errno)));
+	      continue;
+	}
+	
+      //  len = recv(sock_new, &buf, sizeof(struct kg), 0);
+      //  close(sock_new);
+	while( (len=recv(sock_new, &buf, sizeof(struct kg), 0)) >0 )
+	{ 
+	if (len == sizeof(struct kg))
+	{  
+	  log.log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
+	      
+	      if (buf.number >= 1 && buf.number <= 48)
+	      {
+		if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
+		{ 
+		    apparate[buf.number]->checkNewMessage(buf);
+		    apparate[buf.number]->setPrio(1);
+		} else  
+		  {
+			log.log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
+			reSetInterfece(buf);
+		}
+	  //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
+	      }
+	      else
+	    log.log("ERROR: buf.number = " + LexicalCaster(buf.number));
+	}
      }
      close( sock_new );
   // else
@@ -256,9 +260,7 @@ void* pthreadChangeKeys(void *unused)
   UNUSED ( unused);
      int sock_new, ret;
      struct kg buf, kdg;
-     ushort num;// arr[11];
-   //  union chanNum cnum;
-    // struct MarkerInfo minfo;
+     ushort num;
      std::ostringstream os;
      
      int sockfd = make_socket(7001);

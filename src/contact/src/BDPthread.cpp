@@ -142,7 +142,7 @@ bool BDPthread::getUiIp( std::string * str, const ushort num )
 {
   std::ostringstream query;
   query << "select ip from ui_ip where index =\
-    ( select nport from sost_sa_rpu where num = " << num << " ;";
+    ( select nport from sost_sa_rpu where num = " << num << " );";
   char ip[20];
    pthread_mutex_lock(&dbMutex);
    bool ok = db->singleSelect(query.str(), ip, sizeof(ip));
