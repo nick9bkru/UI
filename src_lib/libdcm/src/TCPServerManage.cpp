@@ -11,6 +11,8 @@
 
 #include "Log.h"
 
+using namespace UIservice ;
+
 extern SKLib::Log log;
 
 TCPServerManage::TCPServerManage( const std::string _port ) : TCPManage(), port(_port) //port слушающий порт
@@ -31,7 +33,7 @@ void TCPServerManage::start()
   socklen_t sin_size = sizeof(their_addr);
 
   fd_set rfds;
-  struct timeval tv = {0 , 10000};
+  struct timeval tv = {1 , 0};
   int retval = -1 ;
     
   while ( IsWork )
@@ -50,18 +52,52 @@ void TCPServerManage::start()
       connect( new_fd, std::string (inet_ntoa (their_addr.sin_addr)));
     };
 //     std::cout << " !!! === " << strerror(errno) << " !!!" << std::endl;
-    sleep( 1) ;
+   // sleep( 1) ;
   };
 }
 
 void TCPServerManage::init()
-{
-    struct addrinfo hints, *servinfo, *p;
+{/*
+  struct sockaddr_in addr;
+  int rc=1;
+    int err,len;
+     
+ memset( &addr , 0, sizeof(addr) );
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons (port);
+  
+  addr.sin_addr.s_addr = INADDR_ANY ; 
 
+  
+   if( -1 == ( sockfd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP ) )) 
+   {
+    perror( "Socket can not created!\n");
+    return ;
+    }
+ setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &rc, sizeof(rc) );
+ // задаем сокету опцию SO_REUSEADDR
+ // повторное использование локальных адресов для функц. bind() 
+
+  // связываем адрес с дескриптором слушающего сокета
+  if ( err = bind( sockfd, (struct sockaddr*) &addr, sizeof(addr) ) < 0 ) 
+  {
+  close(sockfd);
+  perror( "bind error! " );
+  return ;
+  }
+  // начинаем слушать сокет
+  if ( listen( sockfd, 25) < 0) 
+  { 
+    close(sockfd);
+    perror( "listen error!\n");
+    return ;
+  }*/
+
+    struct addrinfo hints, *servinfo, *p;
      int yes=1;
     int rv;
     
-    std::string PORT = "4001";
+//     std::string PORT = "4001";
     
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;

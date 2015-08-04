@@ -1,6 +1,8 @@
 #include "TCPManage.h"
 #include <algorithm>
 
+using namespace UIservice ;
+
 TCPManage::TCPManage() 
 {
 //    std::cout << "Constructor TCPManage::TCPManage() !!!!! " << std::endl;

@@ -1,43 +1,37 @@
-#include "UiTcp.h"
+#include "UiTcpArp.h"
 
-UiTcp::UiTcp(std::string _ip, int _port) :  SKLib::TCPSocketInterface(_port), type ( 0 ), ip(_ip)
+UiTcpArp::UiTcpArp(std::string _ip, int _port) :  UIservice::UiTcp( _ip, _port ) , type ( 0 )
 {
- SKLib::TCPSocketInterface::setFd( -1 );
 }
 
-UiTcp::~UiTcp()
+UiTcpArp::~UiTcpArp()
 {
   close();
 }
 
-std::string UiTcp::getInfo() const
+int UiTcpArp::close(  )
 {
-  return ip;
-};
-
-int UiTcp::close(  )
-{
-  std::cout << "UiTcp::close(  ) getInfo  " << ip  << std::endl;
+  std::cout << "UiTcpArp::close(  ) getInfo  " << getInfo()  << std::endl;
   MutexLocker q(mtx);
   return SKLib::TCPSocketInterface::close();
   
 };
 
 
-void UiTcp::setFd(int _fd)
+void UiTcpArp::setFd(int _fd)
 {
    MutexLocker q(mtx);
   SKLib::TCPSocketInterface::setFd( _fd);
 };
 
-bool UiTcp::setState(unsigned char state)
+bool UiTcpArp::setState(unsigned char state)
 {
   std::ostringstream querry;
   querry << "set" <<  state << "\t";
   return (answAndGet ( querry.str() ) != -1 );
 };
 
-int UiTcp::getnotState()
+int UiTcpArp::getnotState()
 {
   
   
@@ -46,13 +40,13 @@ int UiTcp::getnotState()
 
 };
 
-int UiTcp::gtsState()
+int UiTcpArp::gtsState()
 {
   std::string cmd = "gts\r";
   return  answAndGet (cmd);
 };
 
-int UiTcp::answAndGet( const std::string cmd)
+int UiTcpArp::answAndGet( const std::string cmd)
 {
   int buf;
   char b [3];

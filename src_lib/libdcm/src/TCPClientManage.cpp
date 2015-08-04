@@ -1,6 +1,7 @@
 #include "TCPClientManage.h"
 
 #include "Log.h"
+using namespace UIservice ;
 
 extern SKLib::Log log;
 
