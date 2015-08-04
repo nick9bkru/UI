@@ -4,13 +4,12 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include "PMutexLocker.h"
-
-#include "TCPSocketInterface.h"
+#include "../libdcm/include/UiTcp.h"
 
 
 /** @brief Класс для работы с УИ 
 */
-class UiTcp : public SKLib::TCPSocketInterface
+class UiTcp : public UIservice::UiTcp
 {
 
   enum
@@ -19,28 +18,17 @@ class UiTcp : public SKLib::TCPSocketInterface
    NEWMSG = 0 // количество повторений нового состояния после чего сохраняем
   };
 public:
-   /** enum typeUI
-  \brief типы УИ используемые в комплексе для бд
-*/
-  enum typeUIBD
-  {
-    UINSD = 0,
-    UIUPS,
-    UIARPU
-  };
-  
+
   UiTcp(std::string _ip, int _port);
-  ~UiTcp();
-  virtual std::string getInfo() const;
-  int open(const std::string & ipAddr); // просто убираем из доступа ipAddr не используется!!
-  int open();
+  virtual ~UiTcp();
+  virtual int open();
   bool answState(); // запрашивает состояние с сухих контактов
   virtual bool recieveState();
   
   bool resetLastAnsw();
-  int close(  );
+  virtual int close(  );
   
-  void setFd(int _fd);
+  virtual void setFd(int _fd);
 protected:
   //записать в БД новое значение 
   virtual void setNewState ( int state ) = 0;
@@ -64,8 +52,7 @@ private:
   
   
   int countNewMsg; //счетчик новых сообщений что бы отсекать ложные слабатывания
-  
-  std::string ip;
+
   
 };
 

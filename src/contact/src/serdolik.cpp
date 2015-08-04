@@ -1,7 +1,7 @@
 #include "serdolik.h"
 
 extern BDPthread *db;
-serdolik::serdolik(struct sa_info _cfg) : Apparate(_cfg)
+serdolik::serdolik(struct sa_info _cfg, UiTcpArp * _ifaceDcm) : Apparate(_cfg), ifaceDcm( _ifaceDcm )
 {
     setExpansionUnitPos();
     init_pk();
@@ -20,16 +20,7 @@ serdolik::~serdolik()
 
 void serdolik::setExpansionUnitPos()
 {
-     switch (getType())
-     {
-	case Serdolik:
-	  ExpansionUnitPos = (cfg.num - 41) % 4 + 1;
-	  break;
-	 default:  //  Kulon
-	  ExpansionUnitPos = 1;
-	  break;
-     
-     }
+     ExpansionUnitPos = (cfg.num - 41) % 4 + 1;
 
      log1("ExpansionUnitPos=" + LexicalCaster(ExpansionUnitPos));
 }
@@ -51,7 +42,10 @@ int serdolik::update()
      // не Кулон ----------------------
 	  if (ioSendBuf != ioBuf[OUT])
 	  {
-	     ifaceDcm->setState(app2private(ioSendBuf, 1));
+ 	     ifaceDcm->setState(app2private(ioSendBuf, 1));
+	    
+	    
+	    
 	      /*     
 	    if (state_buf > 0 && dcNeedSendCall)
 	      {
@@ -76,7 +70,7 @@ int serdolik::update()
 	  {
 		// Обрабатываем полученный ответ.
 	         int state_buf;
-		 state_buf = (j==0) ? ifaceDcm->getnotState() : ifaceDcm->gtsState_(); 
+ 		 state_buf = (j==0) ? ifaceDcm->getnotState() : ifaceDcm->gtsState(); 
 		if ( state_buf > 0)
 		{
 		  nval = state_buf;

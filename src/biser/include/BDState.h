@@ -12,7 +12,7 @@ class BDState
 {
 public:
   BDState(Database * _db);
-  ~BDState();
+  virtual ~BDState();
   //получить состояние контакта cont, УИ c ip 
   int getNSDstate( std::string ip, int cont);
   //максимальный контакт у Ip 

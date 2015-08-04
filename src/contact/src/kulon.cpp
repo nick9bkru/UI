@@ -1,6 +1,7 @@
 #include "kulon.h"
+
 extern BDPthread *db;
-kulon::kulon(struct sa_info _cfg) : Apparate(_cfg)
+kulon::kulon(struct sa_info _cfg, SKLib::DataInterface * _iface) : Apparate(_cfg), iface (_iface)
 {
   init_pk();
 }
@@ -267,4 +268,10 @@ void kulon::commandBlock(ushort p)
      updateTables();
      
      sendCuuChanges();
+}
+
+void kulon::setDataInterface(SKLib::DataInterface * _iface)
+{
+	log1("setDataInterface(): ");
+     iface = _iface;
 }

@@ -51,20 +51,24 @@ include_directories( ${HEADERS_DIRECTORY} ${SOURCES_DIRECTORY})
 ###############################################
 set(HEADERS
 ${HEADERS_DIRECTORY}/apparate.h
-${HEADERS_DIRECTORY}/TDcmInteface.h
 ${HEADERS_DIRECTORY}/config.h
 ${HEADERS_DIRECTORY}/RapsodiaSet.h
 ${HEADERS_DIRECTORY}/BDPthread.h
 ${HEADERS_DIRECTORY}/BDmain.h
+${HEADERS_DIRECTORY}/kulon.h
+${HEADERS_DIRECTORY}/serdolik.h
+${HEADERS_DIRECTORY}/UiTcpArp.h
 )
 ##############################################
 set(SOURCES
 ${SOURCES_DIRECTORY}/main.cpp
 ${SOURCES_DIRECTORY}/apparate.cpp
-${SOURCES_DIRECTORY}/TDcmInteface.cpp
 ${SOURCES_DIRECTORY}/RapsodiaSet.cpp
 ${SOURCES_DIRECTORY}/BDPthread.cpp
 ${SOURCES_DIRECTORY}/BDmain.cpp
+${SOURCES_DIRECTORY}/kulon.cpp
+${SOURCES_DIRECTORY}/serdolik.cpp
+${SOURCES_DIRECTORY}/UiTcpArp.cpp
 )
 ###############################################
 #Включение в зависимости только h-ов, чтобы при 

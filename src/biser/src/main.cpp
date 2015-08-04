@@ -28,7 +28,7 @@ int mainThreadPid;
 void *pthreadTcpMng (void * );
 
 ///<  класс следит за подключением к УИ
-TCPManage *TcpMng;
+UIservice::TCPManage *TcpMng;
 ///<  класс опроса всех УИ
 nsdManage * NsdMng;
 
@@ -96,15 +96,15 @@ int main(int argc, char **argv)
   
   try
   {
-      TcpMng = new TCPServerManage(4001);
+      TcpMng = new UIservice::TCPServerManage("4001");
     ///<  Идентификаторы потока
      
       pthread_create(&pidPthreadTcmMng, NULL, pthreadTcpMng, NULL); 
       
       NsdMng = new nsdManage ( db.get());
       NsdMng->init();
-      TCPManage::UiVec vec = NsdMng->getUiVec();
-      for ( TCPManage::UiVec::iterator it=vec.begin(); it!=vec.end(); it++)
+      UIservice::TCPManage::UiVec vec = NsdMng->getUiVec();
+      for ( UIservice::TCPManage::UiVec::iterator it=vec.begin(); it!=vec.end(); it++)
       {
 	TcpMng->addUi(*it);
       }

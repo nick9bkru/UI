@@ -35,11 +35,18 @@ endif(IS_USLEEP_ENABLED)
 set(HEADERS
 ${HEADERS_DIRECTORY}/tdrycontactmodule.h
 ${HEADERS_DIRECTORY}/TDcmCli.h
+${HEADERS_DIRECTORY}/TCPManage.h
+${HEADERS_DIRECTORY}/TCPClientManage.h
+${HEADERS_DIRECTORY}/TCPServerManage.h
+${HEADERS_DIRECTORY}/UiTcp.h
 )
-
 set(SOURCES
 ${SOURCES_DIRECTORY}/tdrycontactmodule.cpp
 ${SOURCES_DIRECTORY}/TDcmCli.cpp
+${SOURCES_DIRECTORY}/TCPManage.cpp
+${SOURCES_DIRECTORY}/TCPClientManage.cpp
+${SOURCES_DIRECTORY}/TCPServerManage.cpp
+${SOURCES_DIRECTORY}/UiTcp.cpp
 )
 
 ###############################################
@@ -57,7 +64,7 @@ INCLUDE(IncludeOnlyHeaders)
 include_only_headers(${HEADERS})
 ###############################################
 set(CMAKE_EXE_LINKER_FLAGS "-pg")
-add_definitions(-pipe -O2 -Werror -Wall -W -ggdb -g -pg -fPIC -D_REENTRANT) #для профилировщика gprof
+add_definitions(-pipe -O2 -Wall -W -ggdb -g -pg -fPIC -D_REENTRANT -Werror) #для профилировщика gprof
 #add_definitions(-pipe -O2 -Werror -Wall -W -ggdb -fPIC -D_REENTRANT)
 
 #Preven warn

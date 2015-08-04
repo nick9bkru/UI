@@ -6,7 +6,7 @@
 class kulon :  public Apparate
 {
 public:
-  kulon(struct sa_info _cfg);
+  kulon(struct sa_info _cfg, SKLib::DataInterface * _iface);
   ~kulon();
   /**
       \brief Основная функция, вызывающаяся в бесконечном цикле для каждого аппарата.
@@ -18,7 +18,14 @@ public:
       \retval 1, если функция выполнена успешно.
      */
      virtual int update();
+          /**
+	\brief Привязать интерфейс для взаимодействия с модулем или счетчиком.
+	\param _iface - указатель на экземпляр класса для интерфейса.
+	\param dt - модуль или счетчик.
+      */
+     void setDataInterface(SKLib::DataInterface * _iface);
 private:  
+       SKLib::DataInterface * iface; ///< Интерфейсы для взаимодействия с модулем и счетчиком.
      ushort  answerKulon();
      int sendReceiveKulon();
           /**

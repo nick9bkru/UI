@@ -55,9 +55,9 @@ void nsdManage::start ()
   while (IsWork)
   {
     //посылаем запрос!! 
-    for (TCPManage::UiVec::iterator it = Dcm.begin(); it != Dcm.end(); it ++)
+    for (UIservice::TCPManage::UiVec::iterator it = Dcm.begin(); it != Dcm.end(); it ++)
      {
-      if ( !( *it )->answState() && (*it)-> isConnect() )
+      if ( ! ( (UiTcp* )( *it ))->answState() && (*it)-> isConnect() )
       {
 	(*it)->close();
       }
@@ -80,7 +80,7 @@ int nsdManage::selectAll ()
     tv.tv_usec = 100000;
     try
     {
-	for (TCPManage::UiVec::iterator it = Dcm.begin(); it != Dcm.end(); it ++)
+	for (UIservice::TCPManage::UiVec::iterator it = Dcm.begin(); it != Dcm.end(); it ++)
 	{
 	  if ( (*it)-> isConnect())
 	  {
@@ -99,12 +99,13 @@ int nsdManage::selectAll ()
 	if ( retval )
 	{
 	  
-	  for (TCPManage::UiVec::iterator it = Dcm.begin(); it != Dcm.end(); it ++)
+	  for (UIservice::TCPManage::UiVec::iterator it = Dcm.begin(); it != Dcm.end(); it ++)
 	  {
+	    
 	    if ( (*it)-> isConnect()  &&  FD_ISSET( (*it)->getFd(), &rfds ) )
 	    {
 // 	      std::cout << " Receive from  " << (*it)->getInfo()  << std::endl;
-	      ( *it )-> recieveState ();
+	      ((UiTcp* )( *it ))-> recieveState ();
 	    };
 	  };
 	};
@@ -123,7 +124,7 @@ void nsdManage::stop ()
   IsWork = 0;
 }
 
-TCPManage::UiVec nsdManage::getUiVec() const
+UIservice::TCPManage::UiVec nsdManage::getUiVec() const
 {
   return Dcm;
 };

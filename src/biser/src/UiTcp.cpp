@@ -1,33 +1,20 @@
-#include "UiTcp.h"
+#include "../../biser/include/UiTcp.h"
 
-UiTcp::UiTcp(std::string _ip, int _port) :  SKLib::TCPSocketInterface(_port), ip(_ip)
+UiTcp::UiTcp(std::string _ip, int _port) :  UIservice::UiTcp (_ip, _port)
 {
  //countSend = 0;
  TIMEINTERVAL = 10000000; //1 секунды 
  TIMENEXTASK = 100000;
  countNewMsg= 0;
- SKLib::TCPSocketInterface::setFd( -1 );
 }
 
 UiTcp::~UiTcp()
 {
-  close();
 }
-
-std::string UiTcp::getInfo() const
-{
-  return ip;
-};
-
-int UiTcp::open( const std::string & ipAddr )
-{
-  return open(  );
-  
-};
 
 int UiTcp::close(  )
 {
-  std::cout << "UiTcp::close(  ) getInfo  " << ip  << std::endl;
+  std::cout << "UiTcp::close(  ) getInfo  " << getInfo()  << std::endl;
   MutexLocker q(mtx);
   setUiOn(  );
   return SKLib::TCPSocketInterface::close();
@@ -40,7 +27,7 @@ int UiTcp::open(  )
   gettimeofday(&timeLastAsk, NULL);;
   timeLastAsk.tv_sec--;
   MutexLocker q(mtx);
-  return ( SKLib::TCPSocketInterface::open( ip ) && resetLastAnsw ());
+  return ( SKLib::TCPSocketInterface::open( getInfo() ) && resetLastAnsw ());
   
 };
 

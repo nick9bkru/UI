@@ -21,7 +21,6 @@
 
 #include "BDPthread.h"
 
-#include "TDcmInteface.h"
 #include "DataInterface.h"
 #include "Log.h"
 
@@ -32,7 +31,8 @@ extern SKLib::Log log;
    \brief Класс для работы со всеми типами аппаратов.
 */
 class Apparate
-{     
+{    
+protected:
      /**
  \enum initFlags
  \brief Флаги для инициализации объекта класса.
@@ -45,8 +45,7 @@ class Apparate
      
      struct sa_info cfg; ///< Конфигурация и настройки аппарата из БД.
 
-     SKLib::DataInterface * iface; ///< Интерфейсы для взаимодействия с модулем и счетчиком.
-      TDcmInteface * ifaceDcm; ///< Интерфейсы для взаимодействия с модулем и счетчиком.
+
       
      ushort ExpansionUnitPos; ///< Позиция модуля в корзине расширения.
      
@@ -80,7 +79,7 @@ class Apparate
  \sa Apparate::initFlags.
      */
      void init(int flags);
-     void init_pk();
+     virtual void init_pk() = 0;
      /**
  \brief Преобразует APP-значение команды или индикации к частному.
  \param sost - APP-значение.
@@ -97,19 +96,13 @@ class Apparate
      */
      ushort private2app(ushort sost, ushort io) const;
      
-     /**
- \brief Преобразует частное значение  индикации Кулона к APP-значению.
-        При наличии 0 в 11 бите слова состояния добавление индикации ПУС К1
- \param sost -  частное значение.
- \return APP-значение для частного значения sost.
-     */
-ushort  private2app_Kulon( ushort  sost)  const;
+
 
      /**
  \brief Получить информацию о текущем ключе.
  \return APP_K1, APP_K2 или 0.
      */
-     inline ushort getCurrentKey() const;
+     ushort getCurrentKey() const;
 
      /**
  \brief Добавить запись в журнал.
@@ -127,7 +120,7 @@ ushort  private2app_Kulon( ushort  sost)  const;
  \brief Получить строку с состоянием аппарата.
  \return Строка с состоянием.
      */
-     inline std::string getStateString() const;
+      std::string getStateString() const;
 
      /**
  \brief Тип вызова - ручной?
@@ -159,7 +152,7 @@ ushort  private2app_Kulon( ushort  sost)  const;
  \retval true, если проверка прошла успешно.
  \retval false, если нет.
      */
-     inline ApparateType getType() const;
+     ApparateType getType() const;
 
      /**
  \brief Проверяется условие: данный аппарат годен к участию в соединениях?
@@ -167,7 +160,7 @@ ushort  private2app_Kulon( ushort  sost)  const;
  \retval true, если годен.
  \retval false, если нет.
      */
-     bool isReadyToConnect() const;
+     virtual bool isReadyToConnect() =0;
 
      /**
  \brief Для данного аппарата используется счетчик?
@@ -198,21 +191,15 @@ ushort  private2app_Kulon( ushort  sost)  const;
  */
      void  write_sig_rmo( ushort kod);
 
-     ushort  answerKulon();
-     int sendReceiveKulon();
      
      /**
  \brief Устанавливает тип вызова.
  \param n - длительность вызова для данного аппарата из БД.
  \sa ushort Apparate::dcCallLong.
      */
-     inline void setCallLong(ushort n);
+     void setCallLong(ushort n);
 
-     /**
- \brief Определяет позицию модулей в корзине.
- \sa ushort Apparate::ExpansionUnitPos.
-     */
-     void setExpansionUnitPos();     
+   
      
      /**
  \brief Записывает новые данные в БД.
@@ -237,30 +224,25 @@ public:
      /**
  \brief Деструктор.
      */
-     ~Apparate();
+     virtual ~Apparate();
 
      static pthread_mutex_t updateMutex;
      static pthread_mutex_t dbMutex;     
      volatile bool isOn; 	///< подключен ли аппарат к nport
 
-     /**
- \brief Привязать интерфейс для взаимодействия с модулем или счетчиком.
- \param _iface - указатель на экземпляр класса для интерфейса.
- \param dt - модуль или счетчик.
-      */
-     void setDataInterface(SKLib::DataInterface * _iface);
+
      int  update_prio( int val );
      void    setPrio(int  val);  
      /**
- \brief Основная функция, вызывающаяся в бесконечном цикле для каждого аппарата.
- 
- Сначала, в случае если это необходимо, посылается команда управления.
- Потом опрашивается модуль ввода-вывода на наличие нового состояния аппарата.
- \return Результат опроса аппарата.
- \retval 0, если ошибка.
- \retval 1, если функция выполнена успешно.
+      \brief Основная функция, вызывающаяся в бесконечном цикле для каждого аппарата.
+      
+      Сначала, в случае если это необходимо, посылается команда управления.
+      Потом опрашивается модуль ввода-вывода на наличие нового состояния аппарата.
+      \return Результат опроса аппарата.
+      \retval 0, если ошибка.
+      \retval 1, если функция выполнена успешно.
      */
-     int update();
+     virtual int update() = 0;
 
      /**
  \brief Проверяется условие: данный аппарат сейчас в соединении?
@@ -268,7 +250,7 @@ public:
  \retval true, если да.
  \retval false, если нет.
      */
-     inline bool isInConnection() const;
+     bool isInConnection() const;
      
      bool RKisInConnection() const;
 
@@ -282,21 +264,21 @@ public:
      bool checkNewMessage(const struct kg & buf);
      
      /**
- \brief Перевести аппарат в режим соединения.
- \param p - дополнительная команда(ы).
+      \brief Перевести аппарат в режим соединения.
+      \param p - дополнительная команда(ы).
      */
-     void commandOn(ushort p);
+     virtual void commandOn(ushort p) = 0;
 
      /**
- \brief Перевести аппарат в режим готовности к соединению.
+      \brief Перевести аппарат в режим готовности к соединению.
      */
-     void commandOff();
+     virtual void commandOff() = 0;
 
      /**
- \brief Ввести-вывести аппарат из конфигурации.
- \param p - вывести(0), ввести(1).
+      \brief Ввести-вывести аппарат из конфигурации.
+      \param p - вывести(0), ввести(1).
      */
-     void commandBlock(ushort p);
+     virtual void commandBlock(ushort p) = 0;
 
      /**
  \brief Установить команду заданную параметром p.
@@ -314,7 +296,7 @@ public:
  \brief Посылает исходящий вызов или отбой.
  \param p - параметр, вызов или отбой.
      */
-     void commandCall(ushort p);
+     virtual void commandCall(ushort p) = 0;
 
      /**
  \brief Устанавливает новый ключ в данном аппарате.
@@ -341,31 +323,7 @@ std::ostream & operator<< (std::ostream & strm, const struct sa_info & foo);
 /**
    \brief Послать UDP-сообщение на выбранный хост:порт.
 */
-inline int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
-{
-     struct sockaddr_in dest;
-     dest.sin_family = AF_INET;
-     dest.sin_port = htons(destPort);
-     dest.sin_addr.s_addr = inet_addr(destIP);
-
-     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-     if (sockfd == -1)
-     {
-	  log.log("sendUDPMessage(): socket()" + std::string(strerror(errno)));
-	  return -1;
-     }
-
-     setSocketOptions(sockfd);
-
-     int ret = sendto(sockfd, arr, len * sizeof(ushort), 0, (struct sockaddr *)&dest, sizeof(dest));
-
-     if (ret == static_cast<int>(len * sizeof(ushort)))
-	  log.log("sendUDPMessage(): success.");
-     
-     close(sockfd);
-
-     return 1;
-}
+int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len);
 
 // template<class T>
 // int sendUDPMessage(const char * destIP, int destPort, std::vector<T> & t)

@@ -19,14 +19,14 @@ public:
   void init();
   void start ();
   void stop ();
-  TCPManage::UiVec getUiVec() const;
+  UIservice::TCPManage::UiVec getUiVec() const;
 private:
   bool IsWork;
   Database * db;
   BDStateNsd* BDNsd;
   BDStateUps* BDUps;
 
-  TCPManage::UiVec Dcm;
+  UIservice::TCPManage::UiVec Dcm;
   //очищаем вектор
   void cleaVecDcm();
   int selectAll ();

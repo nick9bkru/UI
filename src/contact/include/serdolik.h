@@ -2,11 +2,12 @@
 #define SERDOLIK_H
 
 #include "apparate.h"
+#include "UiTcpArp.h"
 
 class serdolik : public  Apparate
 {
 public:
-  serdolik(struct sa_info _cfg);
+  serdolik(struct sa_info _cfg, UiTcpArp * ifaceDcm);
   ~serdolik();
   /**
       \brief Основная функция, вызывающаяся в бесконечном цикле для каждого аппарата.
@@ -20,7 +21,7 @@ public:
      virtual int update();
 private:
   
-      TDcmInteface * ifaceDcm; ///< Интерфейсы для взаимодействия с модулем и счетчиком.
+      UiTcpArp * ifaceDcm; ///< Интерфейсы для взаимодействия с модулем и счетчиком.
        /**
       \brief Определяет позицию модулей в корзине.
       \sa ushort Apparate::ExpansionUnitPos.

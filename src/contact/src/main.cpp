@@ -13,11 +13,16 @@
 #include <signal.h>
 #include <functional>
 
-#include "apparate.h"
+#include "kulon.h"
+#include "serdolik.h"
+
 #include "defines.h"
 #include "RapsodiaSet.h"
 #include "BDmain.h"
 #include "Log.h"
+
+#include "TCPServerManage.h"
+
 
 
 /// Экземпляр класса для журналирования.
@@ -98,16 +103,7 @@ int main(int argc, char **argv)
 {     
   UNUSED (argv);
      if (argc == 1)
-   daemon(0, 0);
-     
-/*     
-       ushort arr[3] = {5, 0x100, 2};
-       sendMessage(CUU_HOST, 7099, arr, 6);
-       sleep(7);
-       arr[2] = 6;
-       sendMessage(CUU_HOST, 7099, arr, 6);
-       return 127;
-*/
+      daemon(0, 0);
      mainThreadPid = getpid();
 
      log.setDebugMode(argc > 1 ? SKLib::Log::DebugToUserScreen : SKLib::Log::DebugToFile);
@@ -138,31 +134,43 @@ int main(int argc, char **argv)
      sigemptyset(&sigs_to_block);
      sigaddset(&sigs_to_block, SIGPIPE);
      pthread_sigmask(SIG_BLOCK, &sigs_to_block, NULL);
+     UIservice::TCPServerManage * TcpManage = new UIservice::TCPServerManage ( std::string( "4002") );
      
      struct sa_info foo;
      SKLib::DataInterface * iface;
-
+      std::string  ip;
+     UiTcpArp *ifaceDcm;
      try
      {
 	  while ( db_main->getInitAll( &foo) )
 	  {
-	    apparate[foo.num] = new Apparate(foo);
-	    if (foo.nport && foo.port)
+	    switch ( foo.type)
 	    {
-	      iface = rs->getInterfaceForApp((foo.nport-1) * 16 + foo.port, foo.type);
-	      if (iface)
-	      {
-		apparate[foo.num]->setDataInterface(iface);
+	      case Kulon:
+		iface = rs->getInterfaceForApp((foo.nport-1) * 16 + foo.port, foo.type);
+		apparate[foo.num] = new kulon(foo, iface);
+		if (iface)
+		{
+		  apparate[foo.num]->isOn=true;
+		}
+	      break;
+	      case Serdolik:
+		
+		if ( !db->getUiIp( &ip, foo.num ))
+		  throw ( "Dont't find ip = " + ip);
+		ifaceDcm  = new UiTcpArp (ip) ;
+		TcpManage->addUi( ifaceDcm );
+		
+		apparate[foo.num] = new serdolik(foo, ifaceDcm);
 		apparate[foo.num]->isOn=true;
-	      }
-	    } else
-		apparate[foo.num]->isOn= foo.num > 40 ;
-	
+	      default:
+		throw ( std::string (" Don't know apparate type") + LexicalCaster(foo.type) );
+	    }
 	  }
      }
      catch ( std::string e)
      {
-       std::cout << "1 ERROR :::: "<< e << std::endl;
+       log.log() << "1 ERROR :::: "<< e ;
       return -1; 
      }
      pthread_create(&pthread[0], NULL, pthreadReceiver, NULL);
@@ -177,13 +185,8 @@ int main(int argc, char **argv)
 	++n;
      }
 
-     sleep(5);
-     
-     while (1)
-     {
-   sleep(1);
-   continue;
-     }
+         
+     TcpManage->start();
      
      return 0;
 }
@@ -330,49 +333,49 @@ void* pthreadBlockKulons(void *unused)
 
      while (1)
      {
-   ret = listen(sockfd, 10);
-   if (ret < 0)
-   {
-        log.log("listen(): " + std::string(strerror(errno)));
-        continue;
-   }
+	ret = listen(sockfd, 10);
+	if (ret < 0)
+	{
+	      log.log("listen(): " + std::string(strerror(errno)));
+	      continue;
+	}
 
-   sock_new = accept(sockfd, NULL, NULL);
-   if (sock_new < 0)
-   {
-        log.log("accept(): " + std::string(strerror(errno)));
-        continue;
-   }
+	sock_new = accept(sockfd, NULL, NULL);
+	if (sock_new < 0)
+	{
+	      log.log("accept(): " + std::string(strerror(errno)));
+	      continue;
+	}
 
-   ret = recv(sock_new, &buf, 8, 0);
-   close(sock_new);
-   
-   if (ret == 8)
-   {
-        if ((buf[0] != 0xFEFE) || (buf[3] != 0xEFEF))
-        {
-      close(sock_new);
-      continue;
-        }
-        
-        log.log("pthreadBlockKulons: receive KZN=" + LexicalCaster(buf[1])
-         + " status=" + LexicalCaster(buf[2]));
-   }
-   else
-        continue;
+	ret = recv(sock_new, &buf, 8, 0);
+	close(sock_new);
+	
+	if (ret == 8)
+	{
+	      if ((buf[0] != 0xFEFE) || (buf[3] != 0xEFEF))
+	      {
+	    close(sock_new);
+	    continue;
+	      }
+	      
+	      log.log("pthreadBlockKulons: receive KZN=" + LexicalCaster(buf[1])
+	      + " status=" + LexicalCaster(buf[2]));
+	}
+	else
+	      continue;
 
-   while (db_main->getNumSARPU( &num, buf[1]))
-   {
-      if (apparate[num]->isOn)
-      {  
-        kdg.number = num;
-        kdg.command = (buf[2] == 1 ? CMD_SET : CMD_UNSET);
-        kdg.param = APP_ZSBA;
-        apparate[num]->checkNewMessage(kdg);
-        apparate[num]->setPrio(1);
-      }
-      //  prAppLst[getThreadIndexForNum(num)]->add(num);
-   }
+	while (db_main->getNumSARPU( &num, buf[1]))
+	{
+	    if (apparate[num]->isOn)
+	    {  
+	      kdg.number = num;
+	      kdg.command = (buf[2] == 1 ? CMD_SET : CMD_UNSET);
+	      kdg.param = APP_ZSBA;
+	      apparate[num]->checkNewMessage(kdg);
+	      apparate[num]->setPrio(1);
+	    }
+	    //  prAppLst[getThreadIndexForNum(num)]->add(num);
+	}
      }
    return NULL;
 }
@@ -382,9 +385,9 @@ void sig_handler(int signum)
   UNUSED ( signum);
      if (mainThreadPid != getpid())
      {
-   log.log("----- hello! I'am thread. -----");
-   pthread_exit(NULL);
-   return;
+      log.log("----- hello! I'am thread. -----");
+      pthread_exit(NULL);
+      return;
      }
 
      sleep(5);
@@ -397,7 +400,7 @@ void sig_handler(int signum)
      
      // Delete dynamic objects.
      for (int i = 1; i < NDEV; i++)
-   delete apparate[i];
+      delete apparate[i];
 
      delete db;
      delete db_main;
@@ -416,8 +419,9 @@ void* pthreadNPort(void * _arg)
      
      log.log("pthreadNPort(" + LexicalCaster(n) + ")");
 	 
-             switch( n )
-    {	 case 0:
+     switch( n )
+     {	
+	case 0:
 		 low=1;
                high=8;				 
 		 break;
@@ -443,7 +447,7 @@ void* pthreadNPort(void * _arg)
 		 break;
 	 default:
 		 return NULL;
-	 }   		 
+      }   		 
 
    
 
@@ -467,13 +471,15 @@ void* pthreadNPort(void * _arg)
 }
 // опрашивать аппараты с приоритетом >= 2
 void  upd_high_prio_apparate(  int  low, int  high )
-{  int  i, pri;  
-    do{ pri=0;
-                for(  i = low; i<=high; i++)  
-                    pri += apparate[i]->update_prio(2);
-           }  while( pri>0 );       
-    usleep(1);
-    }
+{ 
+  int  i, pri;  
+    do{ 
+      pri=0;
+      for(  i = low; i<=high; i++)  
+         pri += apparate[i]->update_prio(2);      
+    }  while( pri>0 );       
+    usleep(1);    
+}
 
 void reSetInterfece(kg & buf)
 {
@@ -485,11 +491,9 @@ void reSetInterfece(kg & buf)
      log.log("ReSetInterfese  :: num= " + LexicalCaster(buf.number) + ", nport = "+ LexicalCaster(nport) +
 	      " port = "+ LexicalCaster(port));
      pthread_mutex_lock(&(apparate[buf.number]->dbMutex));  
-     if ( port && nport)  
+     if ( port && nport && ( iface = rs->getInterfaceForApp((nport-1) * 16 + port, 0)) )  
       {
-	iface = rs->getInterfaceForApp((nport-1) * 16 + port, 0);
-	if (iface)
-	  apparate[buf.number]->setDataInterface(iface);
+ 	  ((kulon* )apparate[buf.number])->setDataInterface(iface);
 	  apparate[buf.number]->isOn=true; 
       } else        
 	  apparate[buf.number]->isOn=false; //делаем так что бы больше не опрашивать
