@@ -8,6 +8,7 @@ DcmNsd::DcmNsd(std::string _ip, int _port , BDStateNsd* _BDst): UiTcp (_ip,  _po
 {
   log.log() << "Constructor DcmNsd::DcmNsd _ip==  " << _ip << " port ==" << _port ;
   setLastState( );
+  log.log() << "Constructor DcmNsd::DcmNsd maskPin==  " << maskPin << " lastState ==" << lastState ;
   
   type = typeUI;
 }
@@ -46,7 +47,7 @@ void DcmNsd::setNewState ( int state )
 
 void DcmNsd::setLastState( )
 {
-  int max = BDst->getNSDmaxCon( getInfo() );
+  int max = BDst->getNSDmaxCon( getInfo() ) + 1;
   maskPin = 0;
   lastState = 0;
   int pin;
