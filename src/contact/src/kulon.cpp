@@ -193,7 +193,6 @@ void kulon::init_pk()
 
 }
 
-
 bool kulon::isReadyToConnect()
 {
      bool ok = false;

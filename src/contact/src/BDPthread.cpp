@@ -1,10 +1,10 @@
 #include "BDPthread.h"
 
-extern SKLib::Log log;
 
 BDPthread::BDPthread(std::string host, std::string namebd)
 {
-  dbMutex = PTHREAD_MUTEX_INITIALIZER;
+  
+  pthread_mutex_init(&dbMutex, NULL);
   std::cout<< "BDPthread::BDPthread ip ==" << host << " name =" << namebd  << std::endl;
   db = new Database ( host, namebd);
   if ( !db->isReady() )
@@ -12,6 +12,7 @@ BDPthread::BDPthread(std::string host, std::string namebd)
     delete db;
     throw ( std::string (" Don't open BD"));
   };
+  Log =  &SKLib::LogSingleton::Singleton::getInstance();
 }
 
 BDPthread::~BDPthread()
@@ -67,7 +68,7 @@ bool BDPthread::updSARPU( const ushort god, const ushort kl, const ushort num)
    bool ok = db->notSelect( query.str() );
    pthread_mutex_unlock(&dbMutex);
    //лог
-   log.log(query.str() + " - " + (ok ? "OK" : "ERROR"));
+   Log->log(query.str() + " - " + (ok ? "OK" : "ERROR"));
    return ok;
 }
 
@@ -94,7 +95,7 @@ bool BDPthread::updSARPUlsmena( const ushort p, const ushort num)
     pthread_mutex_lock(&dbMutex);
    bool ok = db->notSelect( query.str() );
    pthread_mutex_unlock(&dbMutex);
-log.log(query.str() + " - " + (ok ? "OK" : "ERROR"));
+Log->log(query.str() + " - " + (ok ? "OK" : "ERROR"));
    return ok;
 }
 
@@ -107,7 +108,7 @@ bool BDPthread::updSARPUKonf( const ushort p, const ushort num)
     pthread_mutex_lock(&dbMutex);
    bool ok = db->notSelect( query.str() );
    pthread_mutex_unlock(&dbMutex);
-log.log(query.str() + " - " + (ok ? "OK" : "ERROR"));
+Log->log(query.str() + " - " + (ok ? "OK" : "ERROR"));
    return ok;
 }
 
@@ -120,7 +121,7 @@ bool BDPthread::insSigRmo( const ushort num, const ushort kod)
     pthread_mutex_lock(&dbMutex);
    bool ok = db->notSelect( query.str() );
    pthread_mutex_unlock(&dbMutex);
-log.log(query.str() + " - " + (ok ? "OK" : "ERROR"));
+Log->log(query.str() + " - " + (ok ? "OK" : "ERROR"));
    return ok;
 }
    

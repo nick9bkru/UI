@@ -3,7 +3,7 @@
    \brief Реализация класса Apparate.
    
    Аппараты инициализируются значениями, полученными из БД.
-   \author Кориков Сергей
+   \author 
 */
 #include "apparate.h"
 #include <pthread.h>
@@ -13,7 +13,7 @@
 extern BDPthread *db;
 
 pthread_mutex_t Apparate::updateMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t Apparate::dbMutex = PTHREAD_MUTEX_INITIALIZER;
+// pthread_mutex_t Apparate::dbMutex = PTHREAD_MUTEX_INITIALIZER;
 
 Apparate::Apparate(struct sa_info _cfg):
      cfg(_cfg), ExpansionUnitPos(0),
@@ -31,14 +31,14 @@ Apparate::Apparate(struct sa_info _cfg):
      rabota_off = 0;
      prio = 0;
      isOn=false;
-     
+     Log =  &SKLib::LogSingleton::Singleton::getInstance();
    
    
 }
 
 Apparate::~Apparate()
 {
-     log.log("~Apparate()");
+     Log->log("~Apparate()");
      
 }
 
@@ -551,18 +551,13 @@ void Apparate::log1(const std::string & string1) const
 {
      std::ostringstream ostrm;
      ostrm << setw(3) << setfill(' ') << cfg.num << ": " << string1;
-     log.log(ostrm);
+     Log->log(ostrm);
 }
 
 void Apparate::log1(const std::ostringstream & os) const
 {     
      log1(os.str());
 }
-
-/*inline bool Apparate::isApparateWithFreq() const
-{
-     return (getType() == Argun || getType() == Delta) ? true : false;
-}*/
 
 std::ostream & operator<<(std::ostream & strm, const struct sa_info & foo)
 {
@@ -579,6 +574,7 @@ void  Apparate::setPrio(int  val)
 
 int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
 {
+//      SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
      struct sockaddr_in dest;
      dest.sin_family = AF_INET;
      dest.sin_port = htons(destPort);
@@ -587,7 +583,7 @@ int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
      int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
      if (sockfd == -1)
      {
-	  log.log("sendUDPMessage(): socket()" + std::string(strerror(errno)));
+// 	  Log->log("sendUDPMessage(): socket()" + std::string(strerror(errno)));
 	  return -1;
      }
 
@@ -596,8 +592,9 @@ int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
      int ret = sendto(sockfd, arr, len * sizeof(ushort), 0, (struct sockaddr *)&dest, sizeof(dest));
 
      if (ret == static_cast<int>(len * sizeof(ushort)))
-	  log.log("sendUDPMessage(): success.");
-     
+     {
+// 	  Log->log("sendUDPMessage(): success.");
+     }
      close(sockfd);
 
      return 1;

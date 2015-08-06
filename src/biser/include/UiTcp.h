@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include "PMutexLocker.h"
 #include "../libdcm/include/UiTcp.h"
-
+#include "LogSingleton.h"
 
 /** @brief Класс для работы с УИ 
 */
@@ -36,7 +36,7 @@ protected:
   int maskPin; //используемые контакты
   int lastState; 
   int type; //тип модуля UI
-  
+  SKLib::Log *Log;
 private:
   Mutex mtx ;
   

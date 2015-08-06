@@ -24,6 +24,7 @@ ${HEADERS_DIRECTORY}/LogSingleton.h
 ${HEADERS_DIRECTORY}/TCPSocketInterface.h
 ${HEADERS_DIRECTORY}/util.h
 ${HEADERS_DIRECTORY}/PMutexLocker.h
+${HEADERS_DIRECTORY}/Singleton.h
 )
 ###############################################
 set(SOURCES
@@ -33,6 +34,7 @@ ${SOURCES_DIRECTORY}/TCPSocketInterface.cpp
 ${SOURCES_DIRECTORY}/util.cpp
 ${SOURCES_DIRECTORY}/DeviceInterface.cpp
 ${SOURCES_DIRECTORY}/Log.cpp
+${SOURCES_DIRECTORY}/LogSingleton.cpp
 ${SOURCES_DIRECTORY}/PMutexLocker.cpp
 )
 ###############################################

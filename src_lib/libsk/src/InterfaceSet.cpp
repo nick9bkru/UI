@@ -128,7 +128,7 @@ void* InterfaceSet::pthreadFunc(void* arg)
                os << "ret=" << ret << "  active=" << active << " ActIP[active]=" << ActIP[active];
              } }
 	  sleep(1);
-     }
+     };
 
      return NULL;
-}
+};

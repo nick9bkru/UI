@@ -6,7 +6,7 @@ extern SKLib::Log log;
 
 DcmUps::DcmUps( std::string _ip, int _port,BDStateUps* _BDst ) : UiTcp (_ip,  _port), BDst(_BDst)
 {
-  log.log()  << "Constructor DcmUps::DcmUps _ip==  " << _ip << " port ==" << _port ;
+  Log->log()  << "Constructor DcmUps::DcmUps _ip==  " << _ip << " port ==" << _port ;
   setLastState( );
   type = typeUI;
 }
@@ -18,13 +18,13 @@ DcmUps::~DcmUps()
 
 void DcmUps::setNewState ( int state )
 {
-  log.log() << " NEW state to ip == " << getInfo()<< " state == " << std::hex << "0x"<< state  << std::dec ;
+  Log->log() << " NEW state to ip == " << getInfo()<< " state == " << std::hex << "0x"<< state  << std::dec ;
   lastState ^= state; 
   for ( std::vector<int>::iterator it = usePin.begin(); it!=usePin.end() ; it++)
   {
     if ( ( lastState >>(*it) ) & 0x07 )
     {
-      log.log() << " NEW state to ip == " << getInfo()<< " cont == "<< (*it) << " state ==" << (( state >> (*it)) & 0x07) ;
+      Log->log() << " NEW state to ip == " << getInfo()<< " cont == "<< (*it) << " state ==" << (( state >> (*it)) & 0x07) ;
       BDst -> setUpsState( getInfo(), (*it), ( state >> *it) & 0x07 );
     }
   };

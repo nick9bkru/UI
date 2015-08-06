@@ -16,7 +16,7 @@ namespace SKLib
 	       InterfaceSet();
 	       virtual ~InterfaceSet();
 	       
-	       virtual DataInterface *getInterfaceForApp(int num, int code) = 0;
+	       virtual DataInterface *getInterfaceForApp(int num) = 0;
 	       void add(int nport, DataInterface *ai);
 	       void start() const;
 	       void setLog(Log * _log);

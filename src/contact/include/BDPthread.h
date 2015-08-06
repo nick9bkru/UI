@@ -1,7 +1,7 @@
 #ifndef BDPTHREAD_H
 #define BDPTHREAD_H
 
-#include "Log.h"
+#include "LogSingleton.h"
 #include "Database.h"
 #include <sstream>
 #include <pthread.h>
@@ -23,6 +23,7 @@ public:
   bool updSARPUKonf( const ushort p, const ushort num);
   bool getUiIp( std::string * str, const ushort num );
 private:
+  SKLib::Log *Log ;
   Database *db;
   pthread_mutex_t dbMutex;
 };

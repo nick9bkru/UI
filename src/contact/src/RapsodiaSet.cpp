@@ -1,13 +1,12 @@
 #include "RapsodiaSet.h"
 
-extern SKLib::Log log;
-
 RapsodiaSet::RapsodiaSet():InterfaceSet()
 {
   for ( int j = 0; j < 4; j++)
     for ( int i = 1; i <= 16; i++)
 	add(j,new SKLib::TCPSocketInterface( 50000 + i));
-  log.log("RapsodiaSet::mmap.size() = " + LexicalCaster(mmap.size()));
+  SKLib::Log* Log =  &SKLib::LogSingleton::Singleton::getInstance();
+  Log->log("RapsodiaSet::mmap.size() = " + LexicalCaster(mmap.size()));
 
 //         std::vector<SKLib::DataInterface *>::iterator iter = vec.begin();
 //         while (iter++ != vec.end())
@@ -20,7 +19,7 @@ RapsodiaSet::~RapsodiaSet()
     
 };
 
-SKLib::DataInterface * RapsodiaSet::getInterfaceForApp(int num, int code)
+SKLib::DataInterface * RapsodiaSet::getInterfaceForApp(int num)
 {   int  nport, ind, first_num;
     nport=(num-1) / 16;
     first_num= nport*16 + 1;

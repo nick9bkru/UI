@@ -5,14 +5,14 @@
 #include "DeviceInterface.h"
 #include "TCPSocketInterface.h"
 #include "InterfaceSet.h"
-#include "Log.h"
+#include "LogSingleton.h"
 
 class RapsodiaSet : public SKLib::InterfaceSet
 {
 public:
      RapsodiaSet();
      ~RapsodiaSet();
-     SKLib::DataInterface * getInterfaceForApp(int num, int code);
+     virtual SKLib::DataInterface * getInterfaceForApp(int num);
 };
 
 #endif // RAPSODIASET_H

@@ -20,7 +20,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-using namespace std;
+// using namespace std;
 /*
 string operator<<(string &str,string &str2 )
 {
@@ -58,20 +58,14 @@ namespace SKLib
        //Копирующий конструктор
        message(const message& _message);
        ~message();
-       void set(const string &j) 
-       {
-	  buf = j;
-       };
-       string get()
-       {
-	 return buf;
-       }
+       void set(const std::string &j);
+       std::string get();
      private:
      /**
 	     \var string buf
 	     \brief Строка сообщения	
      */    
-       string buf;
+       std::string buf;
      /**
 	     \var Log * log
 	     \brief Указатель на сласс лога	
@@ -188,7 +182,7 @@ namespace SKLib
 	     \sa void Log::log(const char * str, const struct kg & buf);
 	     \sa void Log::log(const std::string & s);
 	  */
-	  void log(const ostringstream & os);
+	  void log(const std::ostringstream & os);
 
      
 	  /**
@@ -220,25 +214,22 @@ namespace SKLib
 	     \brief Перегруженная оператор записи в журнал.
 	     \param str - сообщение для журнала.
 	   */
-	  message log() 
-	  { 
-	    
-	   return (message(this));
-	  };
+	  message log();
 
      private:
 	  bool first ;
-	  string buf_str;
+	  std::string buf_str;
      };
+     
      template<typename T>
-  message operator<< (message l, const T& t)
-  {
-    ostringstream k;
-    k<<l.get()<<t;
-    l.set(k.str());
-    
-    return l;
-  };
+      message operator<< (message l, const T& t)
+      {
+	std::ostringstream k;
+	k<<l.get()<<t;
+	l.set(k.str());
+	
+	return l;
+      };
 };
 
 #endif

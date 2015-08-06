@@ -1,8 +1,8 @@
 #include "BDState.h"
 
-BDState::BDState(Database * _db): mutexdb (PTHREAD_MUTEX_INITIALIZER), db ( _db )
+BDState::BDState(Database * _db):  db ( _db )
 {
-
+  pthread_mutex_init(&mutexdb, NULL);
 }
 
 BDState::~BDState()
