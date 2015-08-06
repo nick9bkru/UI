@@ -2,7 +2,6 @@
 
 #include "Log.h"
 
-extern SKLib::Log log;
 
 DcmUps::DcmUps( std::string _ip, int _port,BDStateUps* _BDst ) : UiTcp (_ip,  _port), BDst(_BDst)
 {

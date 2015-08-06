@@ -108,6 +108,7 @@ int main(int argc, char **argv)
      {
        db = new BDPthread("127.0.0.1", "frag_pgdb");
        db_main = new BDmain("127.0.0.1", "frag_pgdb");
+       SKLib::Singleton<BDPthread>::init( db );
      } catch ( std::string e)
      {
        std::cout << " ERROR :::: "<< e << std::endl; 
@@ -403,7 +404,6 @@ void sig_handler(int signum)
      for (int i = 1; i < NDEV; i++)
       delete apparate[i];
 
-     delete db;
      delete db_main;
 
      delete rs;

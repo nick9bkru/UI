@@ -214,7 +214,7 @@ protected:
 bool ok;
 
     SKLib::Log *Log ;
-
+    BDPthread *db;
 public:
 
      /**

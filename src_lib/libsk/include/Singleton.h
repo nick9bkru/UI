@@ -12,12 +12,10 @@ namespace SKLib
       public:    
 	~SingletonDestroyer() 
 	{
-	  std::cout << "~SingletonDestroyer() " << std::endl;
 	  delete p_instance;
 	};
 	void initialize( S* p ) 
 	{
-	  std::cout << "initialize " << std::endl;
 	  p_instance = p;
 	};
     };
@@ -39,6 +37,7 @@ namespace SKLib
  	Singleton& operator=(const Singleton& ) ;
       public:
 	static T& getInstance( );
+	static void init ( T * p );
 	
     };
     
@@ -57,6 +56,18 @@ namespace SKLib
 	      destroyer.initialize( p_instance);     
 	  }
 	  return *p_instance;
+    };
+    
+    template < typename T>
+    void Singleton<T>::init ( T * p )
+    {
+       if(!p_instance)     
+       {
+	      p_instance = p;
+	      destroyer.initialize( p);     
+       } 
+       else 
+	 throw ( std::string ( "void Singleton<T>::init ( T * p ) error !!! "));
     };
 };
 #endif // SINGLETON_H

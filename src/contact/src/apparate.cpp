@@ -10,7 +10,7 @@
 
 #define REJECT_EZ
 
-extern BDPthread *db;
+
 
 pthread_mutex_t Apparate::updateMutex = PTHREAD_MUTEX_INITIALIZER;
 // pthread_mutex_t Apparate::dbMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -31,8 +31,9 @@ Apparate::Apparate(struct sa_info _cfg):
      rabota_off = 0;
      prio = 0;
      isOn=false;
+     
      Log =  &SKLib::LogSingleton::Singleton::getInstance();
-   
+     db = &SKLib::Singleton<BDPthread>::getInstance();
    
 }
 
