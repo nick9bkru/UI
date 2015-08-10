@@ -47,7 +47,7 @@ protected:
   int type; //тип модуля UI
   
 private:
-  int answAndGet( const std::string cmd);
+  int answAndGet( const std::string cmd, bool Inv = true);
   Mutex mtx ;
 
   

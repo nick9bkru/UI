@@ -43,17 +43,18 @@ int UiTcpArp::getnotState()
 int UiTcpArp::gtsState()
 {
   std::string cmd = "gts\r";
-  return  answAndGet (cmd);
+  return  answAndGet (cmd, false );
 };
 
-int UiTcpArp::answAndGet( const std::string cmd)
+int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
 {
   int buf;
   char b [3];
-  if ( ! isConnect() || ( onlySend (cmd)  == int (cmd.length()) ) )
+//    std:: cout << getInfo() <<isConnect() << " int (cmd.length()) == " << int (cmd.length()) << std:: endl;
+  if ( ! isConnect() || ( onlySend (cmd)  != int (cmd.length()) ) )
     return -1;
     
-  usleep( 100000 );
+  usleep( 200000 );
   int ret = 0;
   {
     MutexLocker q(mtx);
@@ -72,6 +73,9 @@ int UiTcpArp::answAndGet( const std::string cmd)
  
     
   memcpy( &buf, &(b[1]), 1 );
-  buf = (~buf) & 0xFF;
+  if ( Inv )
+    buf = (~buf);
+  buf &= 0xFF;
+//   std::cout<< "IP == " << getInfo() << " cmd = " << cmd  <<" buf == " << buf  <<std::endl;
   return buf ;
 };

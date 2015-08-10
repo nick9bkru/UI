@@ -12,14 +12,14 @@
 
 extern BDPthread *db;
 
-pthread_mutex_t Apparate::updateMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t Apparate::dbMutex = PTHREAD_MUTEX_INITIALIZER;
+// pthread_mutex_t Apparate::updateMutex = PTHREAD_MUTEX_INITIALIZER;
+// pthread_mutex_t Apparate::dbMutex = PTHREAD_MUTEX_INITIALIZER;
 
 Apparate::Apparate(struct sa_info _cfg):
      cfg(_cfg), ExpansionUnitPos(0),
      NextKey(0), dcCall(0), dcNeedSendCall(0)
 {
-     
+     pthread_mutex_init(&updateMutex, NULL);
      init(INIT_FULL);
      
      time_iv = 0;

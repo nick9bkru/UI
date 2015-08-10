@@ -226,8 +226,7 @@ public:
      */
      virtual ~Apparate();
 
-     static pthread_mutex_t updateMutex;
-     static pthread_mutex_t dbMutex;     
+      pthread_mutex_t updateMutex;     
      volatile bool isOn; 	///< подключен ли аппарат к nport
 
 

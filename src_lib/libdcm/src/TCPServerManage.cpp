@@ -169,6 +169,7 @@ void TCPServerManage::connect( const int fd, const std::string ip)
   //если не нашли такого УИ то закрываем сокет
   if ( it == AllUi.end( ))
   {
+    log.log() << "TCPServerManage::connect don't find ip addr from BD";
     ::close(fd);
   };
 };

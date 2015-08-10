@@ -81,7 +81,7 @@ void* InterfaceSet::pthreadFunc(void* arg)
       first_time = 1;
       active=0;
      while (1)
-     {    command = std::string("ping -c 2 ") + ActIP[active] + std::string(" 2>&1>/dev/null");
+     {    command = std::string("bash -c 'ping -c 2 ") + ActIP[active] + std::string(" 2>&1>/dev/null'");
           if( system( command.c_str() )==0 )  // есть связь с активным IP
 	   {  openAll(ActIP[active], np); 
 	      if( ssvaz_nport==0 || first_time==1) 
@@ -94,7 +94,7 @@ void* InterfaceSet::pthreadFunc(void* arg)
 		   }
 	  }
           else   // нет связи с активным IP
-           { command = std::string("ping -c 2 ") + ActIP[(active+1)%2] + std::string(" 2>&1>/dev/null");
+           { command = std::string("bash -c 'ping -c 2 ") + ActIP[(active+1)%2] + std::string(" 2>&1>/dev/null'");
 	if( ssvaz_nport==1 || first_time==1)   // записать в БД
 	{        os.str("");
 	         os << "echo \"select wr_ssvaz_nport(1" << np << ",0,1," << active+1 << ");\" | psql -d frag_pgdb";

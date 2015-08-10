@@ -44,7 +44,8 @@ const int NDEV = 49;
 Apparate *apparate[NDEV];
      
 pthread_t pthread[3]; ///<  Идентификаторы потоков для приема команд и смены ключей.
-pthread_t pthread_np[6];
+pthread_t pthread_np[4];
+pthread_t pthread_ARPU[2];
 
 //Database *db; ///< Указатель на объект, связанный с БД.
 BDPthread *db; ///< Указатель на объект, связанный с БД.
@@ -74,6 +75,7 @@ void* pthreadChangeKeys(void *unused);
 void* pthreadBlockKulons(void *unused);
 
 void* pthreadNPort(void * _arg);
+void* pthreadARPU (void * _arg);
 
 void sig_handler(int signum);
 
@@ -121,7 +123,6 @@ int main(int argc, char **argv)
      log.log("rs = new RapsodiaSet()");
      rs = new RapsodiaSet();
      rs->start();
-     sleep(3);
      
      signal(SIGHUP,  sig_handler);
      signal(SIGINT,  sig_handler);
@@ -157,12 +158,13 @@ int main(int argc, char **argv)
 	      case Serdolik:
 		
 		if ( !db->getUiIp( &ip, foo.num ))
-		  throw ( "Dont't find ip = " + ip);
+		  throw ( "Dont't find foo.num = " + foo.num);
 		ifaceDcm  = new UiTcpArp (ip) ;
 		TcpManage->addUi( ifaceDcm );
 		
 		apparate[foo.num] = new serdolik(foo, ifaceDcm);
 		apparate[foo.num]->isOn=true;
+		break;
 	      default:
 		throw ( std::string (" Don't know apparate type") + LexicalCaster(foo.type) );
 	    }
@@ -177,15 +179,20 @@ int main(int argc, char **argv)
      pthread_create(&pthread[1], NULL, pthreadChangeKeys, NULL);
      pthread_create(&pthread[2], NULL, pthreadBlockKulons, NULL);
 
-     int n = 0;
-     while (n < 6)
+     int *n;
+//Kulon     
+     for ( int i = 0 ; i < 6 ; i ++ )
      {
-	pthread_create(&pthread_np[n], NULL, pthreadNPort, &n);
-	sleep(1);
-	++n;
-     }
-
-         
+       n = new int (i);
+       pthread_create(&pthread_np[*n], NULL, pthreadNPort, n);
+     };
+//ARPU
+     /*
+     for ( int i = 41 ; i < 49 ; i ++ )
+     {
+       n = new int (i);
+       pthread_create(&pthread_ARPU[*n], NULL, pthreadARPU, n);
+     }; */   
      TcpManage->start();
      
      return 0;
@@ -395,8 +402,7 @@ void sig_handler(int signum)
  //    for (int i = 0; i < 10; i++)
 //   delete prAppLst[i];
 
-     pthread_mutex_destroy(&Apparate::updateMutex);
-     pthread_mutex_destroy(&Apparate::dbMutex);
+//      pthread_mutex_destroy(&Apparate::updateMutex);
      
      // Delete dynamic objects.
      for (int i = 1; i < NDEV; i++)
@@ -409,16 +415,33 @@ void sig_handler(int signum)
 
      exit(0);
 }
+
+void* pthreadARPU (void * _arg)
+{
+ int *buf = (int *) _arg;
+ int n = *buf;
+     delete buf;
+  log.log("pthreadARPU(" + LexicalCaster(n) + ")");
+  for (;;)
+  {
+   apparate[n]->update_prio(0); 
+   usleep(1);
+  }
+  return NULL;
+}
+
 // потоковая функция для последовательного опроса СА подключенных к одному NPortServer
-//_arg = 0,1,2,3 - Кулоны , 4,5 - Сердолики
+//_arg = 0,1,2,3 - Кулоны
 void* pthreadNPort(void * _arg)
 {
-     int n = *(reinterpret_cast<int *>(_arg));
+     int *buf = (int *) _arg;
+ int n = *buf;
+     delete buf;
      int low, high;
      int jj;
      
      log.log("pthreadNPort(" + LexicalCaster(n) + ")");
-	 
+	 sleep(3);
      switch( n )
      {	
 	case 0:
@@ -490,7 +513,7 @@ void reSetInterfece(kg & buf)
       SKLib::DataInterface * iface;
      log.log("ReSetInterfese  :: num= " + LexicalCaster(buf.number) + ", nport = "+ LexicalCaster(nport) +
 	      " port = "+ LexicalCaster(port));
-     pthread_mutex_lock(&(apparate[buf.number]->dbMutex));  
+     pthread_mutex_lock(&(apparate[buf.number]->updateMutex));  
      if ( port && nport && ( iface = rs->getInterfaceForApp((nport-1) * 16 + port, 0)) )  
       {
  	  ((kulon* )apparate[buf.number])->setDataInterface(iface);
@@ -498,5 +521,5 @@ void reSetInterfece(kg & buf)
       } else        
 	  apparate[buf.number]->isOn=false; //делаем так что бы больше не опрашивать
 
-     pthread_mutex_unlock(&(apparate[buf.number]->dbMutex));
+     pthread_mutex_unlock(&(apparate[buf.number]->updateMutex));
 }

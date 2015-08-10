@@ -71,6 +71,7 @@ int serdolik::update()
 		// Обрабатываем полученный ответ.
 	         int state_buf;
  		 state_buf = (j==0) ? ifaceDcm->getnotState() : ifaceDcm->gtsState(); 
+// 		 std::cout << " NUm : " << cfg.num << " state_buf == " << state_buf << std::endl;
 		if ( state_buf > 0)
 		{
 		  nval = state_buf;
