@@ -2,7 +2,7 @@
 
 using namespace SKLib;
 
-extern Log log;
+// extern Log log;
 
 TCPSocketInterface::TCPSocketInterface( int _port)
      : DataInterface(),  port(_port)
@@ -11,7 +11,7 @@ TCPSocketInterface::TCPSocketInterface( int _port)
 
 TCPSocketInterface::~TCPSocketInterface()
 {
-     log.log("~TCPSocketInterface()");
+     log->log("~TCPSocketInterface()");
      shutdown(getFd(), 2);
 }
      
@@ -44,7 +44,7 @@ int TCPSocketInterface::open(const std::string & ipAddr)
 	  return -1;
      }
 
-     log.log( ipAddr + getInfo() + " connected");
+     log->log( ipAddr + getInfo() + " connected");
      
      setFd(sock);
      
@@ -129,7 +129,7 @@ int TCPSocketInterface::onlySend(const std::string & cmdString)
 
 	  if (errno == EPIPE)
 	  {
-	       log.log("EPIPE in send()");
+	       log->log("EPIPE in send()");
 	       this->close();
 	  }
 	  
@@ -147,7 +147,7 @@ int TCPSocketInterface::onlyRead(void *answer, int size)
 
 	  if (errno == EPIPE)
 	  {
-	       log.log("EPIPE in recv()");
+	       log->log("EPIPE in recv()");
 	       this->close();
 	  }
 	  

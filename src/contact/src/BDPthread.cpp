@@ -1,5 +1,9 @@
 #include "BDPthread.h"
 
+BDPthread::BDPthread()
+{
+  throw (std::string ("Using BDPthread::BDPthread(), it's very very bad"));
+}; //для синглтона
 
 BDPthread::BDPthread(std::string host, std::string namebd)
 {

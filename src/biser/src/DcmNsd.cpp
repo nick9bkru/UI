@@ -1,9 +1,5 @@
 #include "DcmNsd.h"
 
-#include "Log.h"
-
-extern SKLib::Log log;
-
 DcmNsd::DcmNsd(std::string _ip, int _port , BDStateNsd* _BDst): UiTcp (_ip,  _port), BDst(_BDst)
 {
   Log->log() << "Constructor DcmNsd::DcmNsd _ip==  " << _ip << " port ==" << _port ;

@@ -28,12 +28,15 @@ Arguments=1
 Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
 Dependency Action=Nothing
 EnvironmentGroup=default
-Executable=file:///home/nick/work/UI/UI/bin/contact
+Executable=file:///home/nick/work/UI/UIControler/bin/contact
 External Terminal=konsole --noclose --workdir %workdir -e %exe
-Project Target=
+Project Target=UIControler,src,biser,biser
 Use External Terminal=false
 Working Directory=
 isExecutable=true
+
+[MakeBuilder]
+Number Of Jobs=5
 
 [Project]
 VersionControlSupport=kdevgit

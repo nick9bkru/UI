@@ -4,6 +4,7 @@
 #include <map>
 #include <pthread.h>
 
+#include "LogSingleton.h"
 #include "DataInterface.h"
 
 using namespace  std;
@@ -22,7 +23,7 @@ namespace SKLib
 	       void setLog(Log * _log);
 	       
 	  protected:
-              
+//                static Log * log;
 	       static  NPortDI  mmap;
 	       static void* pthreadFunc(void*);
 	       static void openAll(const std::string & ipAddr, int nport, bool restart=false);

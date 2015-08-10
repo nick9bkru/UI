@@ -8,10 +8,11 @@ extern SKLib::Log log;
 
 nsdManage::nsdManage( Database * _db): db( _db )
 {
+  Log = &SKLib::LogSingleton::Singleton::getInstance();
   Log->log() << "Constructor nsdManage::nsdManage !!!!!!!!!" ;
   BDNsd = new BDStateNsd ( _db);
   BDUps = new BDStateUps ( _db);
-  Log = &SKLib::LogSingleton::Singleton::getInstance();
+  
 }
 
 nsdManage::~nsdManage()

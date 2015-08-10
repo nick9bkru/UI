@@ -2,14 +2,13 @@
 
 using namespace SKLib;
 
-extern Log log;
-
-
+// extern Log log;
 
 NPortDI InterfaceSet::mmap;
 
 InterfaceSet::InterfaceSet()
 {   
+  //log = &SKLib::LogSingleton::Singleton::getInstance();
 }
 
 InterfaceSet::~InterfaceSet()
@@ -17,7 +16,7 @@ InterfaceSet::~InterfaceSet()
      for (NPortDI::iterator it = mmap.begin(); it != mmap.end(); it++)
 	  delete (it->second);
   
-     log.log("~InterfaceSet()");
+     SKLib::LogSingleton::Singleton::getInstance().log("~InterfaceSet()");
 }
 
 void InterfaceSet::add(int nport, DataInterface *ai)
@@ -41,7 +40,7 @@ void InterfaceSet::start() const
 void InterfaceSet::openAll(const std::string & ipAddr, int nport, bool restart)
 {   DataInterface *ai;
      std::ostringstream os;
-     
+     Log * log = &SKLib::LogSingleton::Singleton::getInstance();
     // log.log("InterfaceSet::openAll() IP="+ ipAddr);
 	 
      pair< NPortDI::iterator, NPortDI::iterator > p;	 
@@ -57,7 +56,7 @@ void InterfaceSet::openAll(const std::string & ipAddr, int nport, bool restart)
 	  {
 	       os.str("");
 	       os << ipAddr << ai->getInfo() << " : " << ai->getErrMsg() << ", fd=" << ai->getFd();
-	       log.log(os);
+	       log->log(os);
 	  }
      }
 }
@@ -67,6 +66,7 @@ void* InterfaceSet::pthreadFunc(void* arg)
      pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
      int  np = *(int *)arg;  // np 0-3
      delete (int *)arg;
+     Log * log = &SKLib::LogSingleton::Singleton::getInstance();
      
       std::ostringstream  os, oip1, oip2;
      
@@ -88,7 +88,7 @@ void* InterfaceSet::pthreadFunc(void* arg)
 	      {  os.str("");
 	         os << "echo \"select wr_ssvaz_nport(1" << np << ",1,0," << active+1 <<");\" | psql -d frag_pgdb";
                  system( os.str().c_str() );
-                 log.log(os);
+                 log->log(os);
                  ssvaz_nport=1;
                  first_time=0;
 		   }
@@ -99,30 +99,30 @@ void* InterfaceSet::pthreadFunc(void* arg)
 	{        os.str("");
 	         os << "echo \"select wr_ssvaz_nport(1" << np << ",0,1," << active+1 << ");\" | psql -d frag_pgdb";
                  system( os.str().c_str() );		  
-                 log.log(os);
+                 log->log(os);
                  ssvaz_nport=0;
                  first_time=0;
 		   }
             if ( system( command.c_str() )==0 )  // есть связь с неактивным IP
             {  os.str("");
 	       os << "Нет связи с " << ActIP[active] << "  Есть связь с " << ActIP[(active+1)%2] << "  restart NPortServer";
-	       log.log(os);
+	       log->log(os);
  
                command = std::string(" /usr/bin/telnet.sh ") + ActIP[(active+1)%2] + std::string(" 50000");
                ret=system( command.c_str() );
                os.str("");
                os << "ret=" << ret << command << strerror( errno );
-               log.log(os);
+               log->log(os);
                if( ret != -1 ) // рестарт NPortServer
                { //sleep(2);
                  active = (active+1)%2;
-                 log.log( "ok system (/usr/bin/telnet.sh ) " + LexicalCaster( active ));
+                 log->log( "ok system (/usr/bin/telnet.sh ) " + LexicalCaster( active ));
                  openAll( ActIP[active], np , true);
                  
 		 os.str("");
                  os << "echo \"select wr_ssvaz_nport(1" << np << ",1,0," << active+1 << " );\" | psql -d frag_pgdb";
                  system(  os.str().c_str() );
-                 log.log(os);
+                 log->log(os);
                  ssvaz_nport=1;		 
                }
                os << "ret=" << ret << "  active=" << active << " ActIP[active]=" << ActIP[active];

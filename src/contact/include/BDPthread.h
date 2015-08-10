@@ -9,7 +9,7 @@
 class BDPthread
 {
 public:
-  BDPthread(){}; //для синглтона
+  BDPthread(); //для синглтона
   BDPthread(std::string host, std::string namebd);
   ~BDPthread();
   

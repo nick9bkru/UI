@@ -19,7 +19,8 @@ Apparate::Apparate(struct sa_info _cfg):
      cfg(_cfg), ExpansionUnitPos(0),
      NextKey(0), dcCall(0), dcNeedSendCall(0)
 {
-     
+     Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     db = &SKLib::Singleton<BDPthread>::getInstance();
      init(INIT_FULL);
      
      time_iv = 0;
@@ -32,8 +33,7 @@ Apparate::Apparate(struct sa_info _cfg):
      prio = 0;
      isOn=false;
      
-     Log =  &SKLib::LogSingleton::Singleton::getInstance();
-     db = &SKLib::Singleton<BDPthread>::getInstance();
+     
    
 }
 
@@ -85,20 +85,6 @@ int  Apparate::update_prio( int val )
        return 1; } 
     return 0;
           
-}
-
-
-void Apparate::updateFreqBuffers(const char *str)
-{
-     char s[5];
-
-     for (int j = 0; j < 2; j++)
-     {
-	memcpy(s, str + 4 + 5*j, 4);
-	s[4] = '\000';
-
-	FreqBuffer[j] = strtol(s, NULL, 16);
-     }
 }
 
 void Apparate::updateTables()

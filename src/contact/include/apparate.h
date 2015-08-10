@@ -205,14 +205,6 @@ protected:
      */
      void updateTables();
  
-     /**
- \brief Записывает состояние счетчика.
- \param str - строка состояния, полученная от счетчика.
- \sa ushort Apparate::FreqBuffer[2], ushort Apparate::FreqBufferOld[2].
-     */
-     void updateFreqBuffers(const char *str);
-bool ok;
-
     SKLib::Log *Log ;
     BDPthread *db;
 public:
