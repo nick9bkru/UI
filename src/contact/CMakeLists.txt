@@ -58,6 +58,7 @@ ${HEADERS_DIRECTORY}/BDmain.h
 ${HEADERS_DIRECTORY}/kulon.h
 ${HEADERS_DIRECTORY}/serdolik.h
 ${HEADERS_DIRECTORY}/UiTcpArp.h
+${HEADERS_DIRECTORY}/apparateManage.h
 )
 ##############################################
 set(SOURCES
@@ -69,6 +70,7 @@ ${SOURCES_DIRECTORY}/BDmain.cpp
 ${SOURCES_DIRECTORY}/kulon.cpp
 ${SOURCES_DIRECTORY}/serdolik.cpp
 ${SOURCES_DIRECTORY}/UiTcpArp.cpp
+${SOURCES_DIRECTORY}/apparateManage.cpp
 )
 ###############################################
 #Включение в зависимости только h-ов, чтобы при 
