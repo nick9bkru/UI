@@ -1,6 +1,5 @@
 #include "serdolik.h"
 
-extern BDPthread *db;
 serdolik::serdolik(struct sa_info _cfg, UiTcpArp * _ifaceDcm) : Apparate(_cfg), ifaceDcm( _ifaceDcm )
 {
     setExpansionUnitPos();

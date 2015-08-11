@@ -7,6 +7,7 @@
 #include "DcmNsd.h"
 #include "DcmUps.h"
 #include "TCPManage.h"
+#include "LogSingleton.h"
 
 /** @brief Класс опрашивает все уи
 */
@@ -30,6 +31,7 @@ private:
   //очищаем вектор
   void cleaVecDcm();
   int selectAll ();
+  SKLib::Log *Log;
 };
 
 #endif // NSDMANAGE_H

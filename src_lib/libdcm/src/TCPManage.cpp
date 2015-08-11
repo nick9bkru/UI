@@ -4,9 +4,10 @@
 using namespace UIservice ;
 
 TCPManage::TCPManage() 
-{
+{ 
 //    std::cout << "Constructor TCPManage::TCPManage() !!!!! " << std::endl;
    AllUi.clear();
+   Log =  &SKLib::LogSingleton::Singleton::getInstance();
 }
 
 TCPManage::~TCPManage()
@@ -16,7 +17,7 @@ TCPManage::~TCPManage()
 
 void TCPManage::addUi ( tUI * _UI)
 {
-  std::cout << "TCPManage::addUi  !!!!! ip ==  " << _UI->getInfo()<< std::endl;
+  Log->log() << "TCPManage::addUi  !!!!! ip ==  " << _UI->getInfo();
   AllUi.push_back(_UI);
 };
 
@@ -24,6 +25,6 @@ void TCPManage::addUi ( tUI * _UI)
 
 void TCPManage::stop ()
 {
-  std::cout << " TCPManage::stop ()   "  << std::endl;
+  Log->log() << " TCPManage::stop ()   " ;
   IsWork = 0;
 }

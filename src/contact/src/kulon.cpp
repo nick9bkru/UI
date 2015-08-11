@@ -1,6 +1,5 @@
 #include "kulon.h"
 
-extern BDPthread *db;
 kulon::kulon(struct sa_info _cfg, SKLib::DataInterface * _iface) : Apparate(_cfg), iface (_iface)
 {
   init_pk();
@@ -192,7 +191,6 @@ void kulon::init_pk()
 
 
 }
-
 
 bool kulon::isReadyToConnect()
 {

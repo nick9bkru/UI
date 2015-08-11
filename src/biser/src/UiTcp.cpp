@@ -6,6 +6,7 @@ UiTcp::UiTcp(std::string _ip, int _port) :  UIservice::UiTcp (_ip, _port)
  TIMEINTERVAL = 10000000; //1 секунды 
  TIMENEXTASK = 100000;
  countNewMsg= 0;
+ Log = &SKLib::LogSingleton::Singleton::getInstance();
 }
 
 UiTcp::~UiTcp()
@@ -55,7 +56,7 @@ bool UiTcp::answState()
  // gettimeofday(&timeLastAsk, NULL);
 
     
-    bool ask = (onlySend (cmd) == cmd.length());
+    bool ask = (onlySend (cmd) == int (cmd.length()));
 
   if ( ask )
   {

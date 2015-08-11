@@ -1,7 +1,7 @@
 /**
    \file apparate.h
    \brief Описание класса Apparate.
-   \author Кориков Сергей
+   \author 
 */
 #ifndef APPARATE_H
 #define APPARATE_H
@@ -22,16 +22,15 @@
 #include "BDPthread.h"
 
 #include "DataInterface.h"
-#include "Log.h"
 
-extern SKLib::Log log;
+#include "LogSingleton.h"
 
 /**
    \class Apparate
    \brief Класс для работы со всеми типами аппаратов.
 */
 class Apparate
-{    
+{	    
 protected:
      /**
  \enum initFlags
@@ -206,13 +205,8 @@ protected:
      */
      void updateTables();
  
-     /**
- \brief Записывает состояние счетчика.
- \param str - строка состояния, полученная от счетчика.
- \sa ushort Apparate::FreqBuffer[2], ushort Apparate::FreqBufferOld[2].
-     */
-     void updateFreqBuffers(const char *str);
-bool ok;
+    SKLib::Log *Log ;
+    BDPthread *db;
 public:
 
      /**
@@ -227,6 +221,7 @@ public:
      virtual ~Apparate();
 
       pthread_mutex_t updateMutex;     
+
      volatile bool isOn; 	///< подключен ли аппарат к nport
 
 

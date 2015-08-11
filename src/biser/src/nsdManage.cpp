@@ -8,9 +8,11 @@ extern SKLib::Log log;
 
 nsdManage::nsdManage( Database * _db): db( _db )
 {
-  log.log() << "Constructor nsdManage::nsdManage !!!!!!!!!" ;
+  Log = &SKLib::LogSingleton::Singleton::getInstance();
+  Log->log() << "Constructor nsdManage::nsdManage !!!!!!!!!" ;
   BDNsd = new BDStateNsd ( _db);
   BDUps = new BDStateUps ( _db);
+  
 }
 
 nsdManage::~nsdManage()
@@ -50,7 +52,7 @@ void nsdManage::init()
 
 void nsdManage::start ()
 {
-  log.log() << "void nsdManage::start ()";
+  Log->log() << "void nsdManage::start ()";
   IsWork = 1;
   while (IsWork)
   {
@@ -112,7 +114,7 @@ int nsdManage::selectAll ()
 	  
     } catch ( int error)
     {
-       log.log() << " ERROR SELECT ==  " << std::strerror( error) ;
+       Log->log() << " ERROR SELECT ==  " << std::strerror( error) ;
       // ошибка!!!!
     };
     return retval;
@@ -120,7 +122,7 @@ int nsdManage::selectAll ()
 
 void nsdManage::stop ()
 {
-  log.log() << "void nsdManage::stop ()" ;
+  Log->log() << "void nsdManage::stop ()" ;
   IsWork = 0;
 }
 

@@ -1,14 +1,10 @@
 #include "DcmNsd.h"
 
-#include "Log.h"
-
-extern SKLib::Log log;
-
 DcmNsd::DcmNsd(std::string _ip, int _port , BDStateNsd* _BDst): UiTcp (_ip,  _port), BDst(_BDst)
 {
-  log.log() << "Constructor DcmNsd::DcmNsd _ip==  " << _ip << " port ==" << _port ;
+  Log->log() << "Constructor DcmNsd::DcmNsd _ip==  " << _ip << " port ==" << _port ;
   setLastState( );
-  log.log() << "Constructor DcmNsd::DcmNsd maskPin==  " << maskPin << " lastState ==" << lastState ;
+  Log->log() << "Constructor DcmNsd::DcmNsd maskPin==  " << maskPin << " lastState ==" << lastState ;
   
   type = typeUI;
 }
@@ -33,7 +29,7 @@ void DcmNsd::setNewState ( int state )
   {
     if ( lastState & 0x01 )
     {
-      log.log()<< " DcmNsd::setNewState to ip == " << getInfo()<< " cont == "<< i << " state ==" << (( state >> i) & 0x01) ;
+      Log->log()<< " DcmNsd::setNewState to ip == " << getInfo()<< " cont == "<< i << " state ==" << (( state >> i) & 0x01) ;
       BDst -> setNsdState( getInfo(), i, ( state >> i) & 0x01 );
     }
     lastState = lastState >> 1; 

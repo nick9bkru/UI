@@ -1,8 +1,8 @@
 #include "BDState.h"
 
-BDState::BDState(Database * _db): mutexdb (PTHREAD_MUTEX_INITIALIZER), db ( _db )
+BDState::BDState(Database * _db):  db ( _db )
 {
-
+  pthread_mutex_init(&mutexdb, NULL);
 }
 
 BDState::~BDState()
@@ -17,6 +17,7 @@ bool BDState::setSostUi( int numUi, bool state )
   pthread_mutex_lock(&mutexdb);
   bool b = db->notSelect( querry.str() ) ;
   pthread_mutex_unlock(&mutexdb);
+  SKLib::LogSingleton::Singleton::getInstance().log()<< querry;
   return b ;
 };
 
@@ -27,5 +28,6 @@ bool BDState::setSostUi( std::string ip, bool state )
   pthread_mutex_lock(&mutexdb);
   bool b = db->notSelect( querry.str() ) ;
   pthread_mutex_unlock(&mutexdb);
+  SKLib::LogSingleton::Singleton::getInstance().log()<< querry;
   return b ;
 };

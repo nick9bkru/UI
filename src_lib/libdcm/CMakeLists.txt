@@ -7,10 +7,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/externModules
 set(LIB_INSTALL_PATH ${CMAKE_SOURCE_DIR}/lib)
 
 set(LIBRARIES_LIB_DCM
+lib_sk
 )
 
 set(LIBRARIES_LIB_DCM_NAME
 pthread
+_sk
 )
 
 foreach(LIBRARY ${LIBRARIES_LIB_DCM})   

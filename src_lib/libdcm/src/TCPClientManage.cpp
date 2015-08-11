@@ -1,9 +1,7 @@
 #include "TCPClientManage.h"
 
-#include "Log.h"
-using namespace UIservice ;
 
-extern SKLib::Log log;
+using namespace UIservice ;
 
 TCPClientManage::TCPClientManage():TCPManage()
 {
@@ -17,7 +15,7 @@ TCPClientManage::~TCPClientManage()
 
 void TCPClientManage::start ()
 {
-  log.log() << " TCPManage::start   " ;
+  Log->log() << " TCPManage::start   " ;
   IsWork = 1;
   while ( IsWork )
   { 
@@ -25,7 +23,7 @@ void TCPClientManage::start ()
     {
        if (( !(*it)->isConnect() ) && connect ( *it ) )
        {
-	 log.log() << " TCPManage::start  !!!!! OPEN ip ==  " << (*it)->getInfo() ;
+	 Log->log() << " TCPManage::start  !!!!! OPEN ip ==  " << (*it)->getInfo() ;
 
        } 
     };

@@ -2,15 +2,16 @@
 
 using namespace SKLib;
 
-extern Log log;
+// extern Log log;
 
 DataInterface::DataInterface(): timeout(50000), fd(-1), answerSize(64)
 {
+  log = &SKLib::LogSingleton::Singleton::getInstance();
 }
 
 DataInterface::~DataInterface()
 {
-     log.log("~DataInterface()");
+     log->log("~DataInterface()");
      this->close();
 }
 
