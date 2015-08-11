@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <functional>
 
-#include "Log.h"
+#include "LogSingleton.h"
 #include "util.h"
 
 #include "nsdManage.h"
@@ -19,7 +19,7 @@
 using namespace std;
 
 ///< Экземпляр класса для журналирования.
-SKLib::Log log("./biser.log");
+SKLib::Log *Log;
 
 ///< PID главного потока.
 int mainThreadPid;
@@ -43,7 +43,7 @@ void sig_handler(int signum)
      UNUSED(signum);
      if (mainThreadPid != getpid())
      {
-	log.log("----- hello! I'am thread. -----");
+	Log->log("----- hello! I'am thread. -----");
 	pthread_exit(NULL);
 	return;
      }
@@ -81,7 +81,8 @@ int main(int argc, char **argv)
       daemon(0, 0);
   mainThreadPid = getpid();
   //Логирующий класс
-  log.setDebugMode(argc > 1 ? SKLib::Log::DebugToUserScreen : SKLib::Log::DebugToFile);
+  Log =  &SKLib::LogSingleton::getInstance( "/tmp/biser.log");
+  Log->setDebugMode(argc > 1 ? SKLib::Log::DebugToUserScreen : SKLib::Log::DebugToFile);
 
   //настраиваем ловушки сигналов)
   setSignal();
@@ -89,10 +90,10 @@ int main(int argc, char **argv)
   std::auto_ptr< Database > db ( new Database( "127.0.0.1","frag_pgdb" )  ); ///< Указатель на объект, связанный с БД.
   if ( !db->isReady() )   
   {
-    log.log("Error !! Database not started !!");
+    Log->log("Error !! Database not started !!");
     exit(-1);
   }
-  log.log("Database is start!!");
+  Log->log("Database is start!!");
   
   try
   {
@@ -111,7 +112,7 @@ int main(int argc, char **argv)
       NsdMng->start();
   } catch ( std::string e)
   {
-    log.log("!!!! ERROR == :" + e);
+    Log->log("!!!! ERROR == :" + e);
     sig_handler(1);
   }
   pthread_join(pidPthreadTcmMng, NULL);
@@ -121,7 +122,7 @@ int main(int argc, char **argv)
 void *pthreadTcpMng (void * unused )
 {
   UNUSED ( unused );
-  log.log("pthreadTcpMng is start!!");
+  Log->log("pthreadTcpMng is start!!");
   TcpMng->start();
   return NULL;
 };

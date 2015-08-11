@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 #include "util.h"
-#include "Log.h"
+#include "LogSingleton.h"
 
 namespace SKLib
 {
@@ -47,7 +47,7 @@ namespace SKLib
      protected:
 	  void setFd(int _fd);
 	  void setErrMsg(std::string _errMsg);
-	  
+	  Log * log;
      private:
 	  int timeout; // in microseconds.
 	  int fd; // file descriptor.

@@ -3,16 +3,15 @@
    \brief Реализация класса Apparate.
    
    Аппараты инициализируются значениями, полученными из БД.
-   \author Кориков Сергей
+   \author 
 */
 #include "apparate.h"
 #include <pthread.h>
 
 #define REJECT_EZ
 
-extern BDPthread *db;
-
 // pthread_mutex_t Apparate::updateMutex = PTHREAD_MUTEX_INITIALIZER;
+
 // pthread_mutex_t Apparate::dbMutex = PTHREAD_MUTEX_INITIALIZER;
 
 Apparate::Apparate(struct sa_info _cfg):
@@ -20,6 +19,9 @@ Apparate::Apparate(struct sa_info _cfg):
      NextKey(0), dcCall(0), dcNeedSendCall(0)
 {
      pthread_mutex_init(&updateMutex, NULL);
+     Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     db = &SKLib::Singleton<BDPthread>::getInstance();
+
      init(INIT_FULL);
      
      time_iv = 0;
@@ -32,13 +34,13 @@ Apparate::Apparate(struct sa_info _cfg):
      prio = 0;
      isOn=false;
      
-   
+     
    
 }
 
 Apparate::~Apparate()
 {
-     log.log("~Apparate()");
+     Log->log("~Apparate()");
      
 }
 
@@ -84,20 +86,6 @@ int  Apparate::update_prio( int val )
        return 1; } 
     return 0;
           
-}
-
-
-void Apparate::updateFreqBuffers(const char *str)
-{
-     char s[5];
-
-     for (int j = 0; j < 2; j++)
-     {
-	memcpy(s, str + 4 + 5*j, 4);
-	s[4] = '\000';
-
-	FreqBuffer[j] = strtol(s, NULL, 16);
-     }
 }
 
 void Apparate::updateTables()
@@ -551,18 +539,13 @@ void Apparate::log1(const std::string & string1) const
 {
      std::ostringstream ostrm;
      ostrm << setw(3) << setfill(' ') << cfg.num << ": " << string1;
-     log.log(ostrm);
+     Log->log(ostrm);
 }
 
 void Apparate::log1(const std::ostringstream & os) const
 {     
      log1(os.str());
 }
-
-/*inline bool Apparate::isApparateWithFreq() const
-{
-     return (getType() == Argun || getType() == Delta) ? true : false;
-}*/
 
 std::ostream & operator<<(std::ostream & strm, const struct sa_info & foo)
 {
@@ -579,6 +562,7 @@ void  Apparate::setPrio(int  val)
 
 int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
 {
+//      SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
      struct sockaddr_in dest;
      dest.sin_family = AF_INET;
      dest.sin_port = htons(destPort);
@@ -587,7 +571,7 @@ int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
      int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
      if (sockfd == -1)
      {
-	  log.log("sendUDPMessage(): socket()" + std::string(strerror(errno)));
+// 	  Log->log("sendUDPMessage(): socket()" + std::string(strerror(errno)));
 	  return -1;
      }
 
@@ -596,8 +580,9 @@ int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
      int ret = sendto(sockfd, arr, len * sizeof(ushort), 0, (struct sockaddr *)&dest, sizeof(dest));
 
      if (ret == static_cast<int>(len * sizeof(ushort)))
-	  log.log("sendUDPMessage(): success.");
-     
+     {
+// 	  Log->log("sendUDPMessage(): success.");
+     }
      close(sockfd);
 
      return 1;

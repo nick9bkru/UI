@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "UiTcp.h"
+#include "LogSingleton.h"
 
 namespace UIservice
 {
@@ -24,6 +25,7 @@ namespace UIservice
     void stop ();
     void addUi (tUI * _UI);
   protected:
+    SKLib::Log *Log ;
     bool IsWork;
     UiVec AllUi;
   };

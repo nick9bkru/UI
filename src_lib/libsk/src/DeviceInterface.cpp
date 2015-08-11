@@ -12,7 +12,7 @@ DeviceInterface::DeviceInterface(const std::string & _device)
 DeviceInterface::~DeviceInterface()
 {
      this->close();
-     log.log("~DeviceInterface()");
+     log->log("~DeviceInterface()");
 }
      
 int DeviceInterface::open()

@@ -38,6 +38,16 @@ message::message(const message& _message)
 	 (*log_write) = true; 
 };
 
+void message::set(const std::string &j) 
+{
+    buf = j;
+};
+
+std::string  message::get()
+{
+  return buf;
+}
+
 Log::Log():fileName("/tmp/contact.log"),first(true),buf_str("")
 {
      pthread_mutex_init(&mut, NULL);
@@ -45,6 +55,7 @@ Log::Log():fileName("/tmp/contact.log"),first(true),buf_str("")
 
 Log::Log(const std::string & _fileName):fileName(_fileName),first(true),buf_str("")
 {
+//   std::cout << "Log() " << _fileName << std::endl;
      pthread_mutex_init(&mut, NULL);
 }
 
@@ -53,11 +64,12 @@ void Log::setDebugMode(DebugMode dm)
      debugMode = dm;
      
      if (debugMode == DebugToFile)
-	  logStream.open(fileName.c_str(),  std::ios::app|ios::out | ios::trunc);
+	  logStream.open(fileName.c_str(),  std::ios::app| std::ios::out | std::ios::trunc);
 }
 
 Log::~Log()
 {
+//   std::cout << "~Log() " << fileName << std::endl;
      log("~Log()");
      
      if (debugMode == DebugToFile)
@@ -75,7 +87,7 @@ void Log::log(const char * str)
 	  if (cnt++ > 1000000)
 	  {
 	       logStream.close();
-	       logStream.open(fileName.c_str(), ios::out | ios::trunc);
+	       logStream.open(fileName.c_str(), std::ios::out | std::ios::trunc);
 	      
 	       cnt = 0;
 	  }
@@ -101,31 +113,6 @@ void Log::log(const std::string & s)
      log(s.c_str());
 }
 
-/*
-void Log::log(const char * str, const struct kg & buf)
-{
-     std::ostringstream message;
-     message << str <<": " <<
-	  setfill('0') << hex
-	     << setw(4) << buf.cyclic_num << " "
-	     << setw(1) << buf.number << " "
-	     << setw(4) << buf.action << " "
-	     << setw(4) << buf.command;
-
-     log(message);
-}
-*/
-
-// std::string Log::get_date_time()
-// {
-//      time_t curtime = time(NULL);
-//      struct tm *loctime = localtime(&curtime);
-
-//      char buffer[255];
-//      strftime(buffer, 255, "%Y-%m-%d %T", loctime);
-
-//      return std::string(buffer);
-// }
 
 std::string Log::get_date_time()
 {
@@ -134,14 +121,23 @@ std::string Log::get_date_time()
      
      struct tm *tm = localtime(&tv.tv_sec);
 
-     ostringstream os;
-     os << setw(2) << setfill('0') << tm->tm_mday << "."
-	<< setw(2) << setfill('0') << (tm->tm_mon + 1) << "."
-	<< setw(2) << setfill('0') << (tm->tm_year + 1900) << ":"
-	<< setw(2) << setfill('0') << tm->tm_hour << ":"
-	<< setw(2) << setfill('0') << tm->tm_min << ":"
-	<< setw(2) << setfill('0') << tm->tm_sec << "."
-	<< setw(3) << setfill('0') << (tv.tv_usec / 1000);
+     std::ostringstream os;
+     os << std::setw(2) <<std:: setfill('0') << tm->tm_mday << "."
+	<< std::setw(2) << std::setfill('0') << (tm->tm_mon + 1) << "."
+	<< std::setw(2) << std::setfill('0') << (tm->tm_year + 1900) << ":"
+	<< std::setw(2) << std::setfill('0') << tm->tm_hour << ":"
+	<< std::setw(2) << std::setfill('0') << tm->tm_min << ":"
+	<< std::setw(2) << std::setfill('0') << tm->tm_sec << "."
+	<< std::setw(3) << std::setfill('0') << (tv.tv_usec / 1000);
 
      return os.str();
 }
+
+message Log::log() 
+{ 
+  
+  return (message(this));
+};
+
+
+

@@ -1,9 +1,10 @@
 #include "TDcmCli.h"
 
    
-TDcmCli::TDcmCli( string _ipAddr, unsigned short int _port ):TDryContactModule(_ipAddr, _port)
+TDcmCli::TDcmCli( std::string _ipAddr, unsigned short int _port ):TDryContactModule(_ipAddr, _port)
 {
 };
+
 TDcmCli::~TDcmCli()
 {
 };
@@ -38,7 +39,7 @@ int TDcmCli::gtsState_()
 void TDcmCli::processState( int statePos, bool state )
 {
       
-	cout << "Позиция №" <<  statePos  << "         изменилась на " <<   state << endl;
+	std::cout << "Позиция №" <<  statePos  <<  "         изменилась на " <<   state << std::endl;
 };
 
 std::string TDcmCli::getIP() const

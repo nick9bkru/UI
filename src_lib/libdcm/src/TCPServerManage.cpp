@@ -9,15 +9,13 @@
 #include <arpa/inet.h>
 #include <cerrno>
 
-#include "Log.h"
 
 using namespace UIservice ;
 
-extern SKLib::Log log;
 
 TCPServerManage::TCPServerManage( const std::string _port ) : TCPManage(), port(_port) //port слушающий порт
 {
-  log.log() << "Constructor TCPServerManage::TCPServerManage() !!!!!  PORT ==" << port ;
+  Log->log() << "Constructor TCPServerManage::TCPServerManage() !!!!!  PORT ==" << port ;
   init();
 }
 
@@ -48,7 +46,7 @@ void TCPServerManage::start()
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
     if ( new_fd != -1)
     {
-      log.log() << " Connect new UI!!! === " << inet_ntoa (their_addr.sin_addr) << " !!!";
+      Log->log() << " Connect new UI!!! === " << inet_ntoa (their_addr.sin_addr) << " !!!";
       connect( new_fd, std::string (inet_ntoa (their_addr.sin_addr)));
     };
 //     std::cout << " !!! === " << strerror(errno) << " !!!" << std::endl;
@@ -114,7 +112,7 @@ void TCPServerManage::init()
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1)
 	{
-	    log.log() << "TCPServerManage::init() == server: socket";
+	    Log->log() << "TCPServerManage::init() == server: socket";
             continue;
         }
 
@@ -128,7 +126,7 @@ void TCPServerManage::init()
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
 	{
             close(sockfd);
-            log.log() << "TCPServerManage::init()server: bind";
+            Log->log() << "TCPServerManage::init()server: bind";
             continue;
         }
 
@@ -169,7 +167,7 @@ void TCPServerManage::connect( const int fd, const std::string ip)
   //если не нашли такого УИ то закрываем сокет
   if ( it == AllUi.end( ))
   {
-    log.log() << "TCPServerManage::connect don't find ip addr from BD";
+    Log->log() << "TCPServerManage::connect don't find ip addr from BD";
     ::close(fd);
   };
 };

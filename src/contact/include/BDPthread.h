@@ -1,7 +1,7 @@
 #ifndef BDPTHREAD_H
 #define BDPTHREAD_H
 
-#include "Log.h"
+#include "LogSingleton.h"
 #include "Database.h"
 #include <sstream>
 #include <pthread.h>
@@ -9,6 +9,7 @@
 class BDPthread
 {
 public:
+  BDPthread(); //для синглтона
   BDPthread(std::string host, std::string namebd);
   ~BDPthread();
   
@@ -23,6 +24,7 @@ public:
   bool updSARPUKonf( const ushort p, const ushort num);
   bool getUiIp( std::string * str, const ushort num );
 private:
+  SKLib::Log *Log ;
   Database *db;
   pthread_mutex_t dbMutex;
 };

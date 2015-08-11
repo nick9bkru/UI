@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 #include <pthread.h>
-
+#include "LogSingleton.h"
 
 #include "Database.h"
 
