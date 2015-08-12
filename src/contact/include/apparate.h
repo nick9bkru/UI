@@ -30,7 +30,117 @@
    \brief Класс для работы со всеми типами аппаратов.
 */
 class Apparate
-{	    
+{	
+  
+public:
+
+  /**
+   \enum deviceType
+   \brief Определение типов используемых аппаратов.
+ */
+    enum ApparateType
+    {
+	Argun = 10,   ///< Аргунь.
+	Delta = 20,   ///< Дельта.
+	Kulon = 30,   ///< Кулон.
+	Serdolik = 40 ///< Сердолик.
+    };
+     /**
+ \brief Конструктор.
+ \param foo - структура для инициализации объекта.
+     */
+     Apparate(struct sa_info foo);
+
+     /**
+ \brief Деструктор.
+     */
+     virtual ~Apparate();
+
+      pthread_mutex_t updateMutex;     
+
+     volatile bool isOn; 	///< подключен ли аппарат к nport
+
+
+     int  update_prio( int val );
+     void    setPrio(int  val);  
+     /**
+      \brief Основная функция, вызывающаяся в бесконечном цикле для каждого аппарата.
+      
+      Сначала, в случае если это необходимо, посылается команда управления.
+      Потом опрашивается модуль ввода-вывода на наличие нового состояния аппарата.
+      \return Результат опроса аппарата.
+      \retval 0, если ошибка.
+      \retval 1, если функция выполнена успешно.
+     */
+     virtual int update() = 0;
+
+     /**
+ \brief Проверяется условие: данный аппарат сейчас в соединении?
+ \return Результат проверки.
+ \retval true, если да.
+ \retval false, если нет.
+     */
+     bool isInConnection() const;
+     
+     bool RKisInConnection() const;
+
+     /**
+ \brief Получает кодограмму для дальнейшей обработки.
+ \param buf - принятая извне кодограмма.
+ \return Результат предварительной обработки.
+ \retval true, проверка прошла успешно.
+ \retval false, если неуспешно.
+     */
+     bool checkNewMessage(const struct kg & buf);
+     
+     /**
+      \brief Перевести аппарат в режим соединения.
+      \param p - дополнительная команда(ы).
+     */
+     virtual void commandOn(ushort p) = 0;
+
+     /**
+      \brief Перевести аппарат в режим готовности к соединению.
+     */
+     virtual void commandOff() = 0;
+
+     /**
+      \brief Ввести-вывести аппарат из конфигурации.
+      \param p - вывести(0), ввести(1).
+     */
+     virtual void commandBlock(ushort p) = 0;
+
+     /**
+ \brief Установить команду заданную параметром p.
+ \param p - команда(ы).
+     */
+     void commandSet(ushort p);
+
+     /**
+ \brief Снять команду заданную параметром p.
+ \param p - команда(ы).
+     */
+     void commandUnset(ushort p);
+
+     /**
+ \brief Посылает исходящий вызов или отбой.
+ \param p - параметр, вызов или отбой.
+     */
+     virtual void commandCall(ushort p) = 0;
+
+     /**
+ \brief Устанавливает новый ключ в данном аппарате.
+ \param p - новый ключ.
+ \sa ushort Apparate::NextKey.
+     */
+     void commandNextKey(ushort p);
+
+     /**
+ \brief Устанавливает/снимает признак "отложенная смена" в данном аппарате.
+ \param p - значение признака: есть признак(1) или нет(0).
+ \sa ushort Apparate::LSMENA.
+     */
+     void commandLsmena(ushort p);
 protected:
      /**
  \enum initFlags
@@ -207,104 +317,7 @@ protected:
  
     SKLib::Log *Log ;
     BDPthread *db;
-public:
 
-     /**
- \brief Конструктор.
- \param foo - структура для инициализации объекта.
-     */
-     Apparate(struct sa_info foo);
-
-     /**
- \brief Деструктор.
-     */
-     virtual ~Apparate();
-
-      pthread_mutex_t updateMutex;     
-
-     volatile bool isOn; 	///< подключен ли аппарат к nport
-
-
-     int  update_prio( int val );
-     void    setPrio(int  val);  
-     /**
-      \brief Основная функция, вызывающаяся в бесконечном цикле для каждого аппарата.
-      
-      Сначала, в случае если это необходимо, посылается команда управления.
-      Потом опрашивается модуль ввода-вывода на наличие нового состояния аппарата.
-      \return Результат опроса аппарата.
-      \retval 0, если ошибка.
-      \retval 1, если функция выполнена успешно.
-     */
-     virtual int update() = 0;
-
-     /**
- \brief Проверяется условие: данный аппарат сейчас в соединении?
- \return Результат проверки.
- \retval true, если да.
- \retval false, если нет.
-     */
-     bool isInConnection() const;
-     
-     bool RKisInConnection() const;
-
-     /**
- \brief Получает кодограмму для дальнейшей обработки.
- \param buf - принятая извне кодограмма.
- \return Результат предварительной обработки.
- \retval true, проверка прошла успешно.
- \retval false, если неуспешно.
-     */
-     bool checkNewMessage(const struct kg & buf);
-     
-     /**
-      \brief Перевести аппарат в режим соединения.
-      \param p - дополнительная команда(ы).
-     */
-     virtual void commandOn(ushort p) = 0;
-
-     /**
-      \brief Перевести аппарат в режим готовности к соединению.
-     */
-     virtual void commandOff() = 0;
-
-     /**
-      \brief Ввести-вывести аппарат из конфигурации.
-      \param p - вывести(0), ввести(1).
-     */
-     virtual void commandBlock(ushort p) = 0;
-
-     /**
- \brief Установить команду заданную параметром p.
- \param p - команда(ы).
-     */
-     void commandSet(ushort p);
-
-     /**
- \brief Снять команду заданную параметром p.
- \param p - команда(ы).
-     */
-     void commandUnset(ushort p);
-
-     /**
- \brief Посылает исходящий вызов или отбой.
- \param p - параметр, вызов или отбой.
-     */
-     virtual void commandCall(ushort p) = 0;
-
-     /**
- \brief Устанавливает новый ключ в данном аппарате.
- \param p - новый ключ.
- \sa ushort Apparate::NextKey.
-     */
-     void commandNextKey(ushort p);
-
-     /**
- \brief Устанавливает/снимает признак "отложенная смена" в данном аппарате.
- \param p - значение признака: есть признак(1) или нет(0).
- \sa ushort Apparate::LSMENA.
-     */
-     void commandLsmena(ushort p);
 };
 
 /**

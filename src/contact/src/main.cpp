@@ -22,6 +22,8 @@
 #include "TCPServerManage.h"
 
 #include "LogSingleton.h"
+#include "apparateManage.h"
+#include "tcpReciever.h"
 
 /// PID главного потока.
 int mainThreadPid;
@@ -74,22 +76,7 @@ void* pthreadARPU (void * _arg);
 
 void sig_handler(int signum);
 
-/**
-   \brief Опрос аппаратов с приоритетом >= 2
-   \param low - наименьший индекс аппарата в группе
-   \param high - наибольший индекс аппарата в группе
-   */
-void  upd_high_prio_apparate(  int  low, int  high );
-
-/**
-  \brief меняем интерфейс для apparate
-   \param buf - номер СА команда и номер порта (nport * 100 + port)
- */
-void reSetInterfece(kg & buf);
-
-
-
-RapsodiaSet * rs;
+apparateManage * appMng;
 
 /**
    \brief Основная функция. Запуск всех потоков, открытие каналов к БД.
@@ -116,11 +103,7 @@ int main(int argc, char **argv)
        std::cout << " ERROR :::: "<< e << std::endl; 
        return -1 ;
      }
-     
-     Log->log("rs = new RapsodiaSet()");
-     rs = new RapsodiaSet();
-     rs->start();
-     
+
      signal(SIGHUP,  sig_handler);
      signal(SIGINT,  sig_handler);
      signal(SIGQUIT, sig_handler);
@@ -132,39 +115,16 @@ int main(int argc, char **argv)
      sigemptyset(&sigs_to_block);
      sigaddset(&sigs_to_block, SIGPIPE);
      pthread_sigmask(SIG_BLOCK, &sigs_to_block, NULL);
-     UIservice::TCPServerManage * TcpManage = new UIservice::TCPServerManage ( std::string( "4002") );
+//      UIservice::TCPServerManage * TcpManage = new UIservice::TCPServerManage ( std::string( "4002") );
+     SKLib::Singleton<UIservice::TCPServerManage>::init( new UIservice::TCPServerManage ( std::string( "4002") ) );
      
-     struct sa_info foo;
-     SKLib::DataInterface * iface;
-      std::string  ip = "";
-     UiTcpArp *ifaceDcm;
+     appMng = new apparateManage ();
      try
      {
+	  struct sa_info foo;
 	  while ( db_main->getInitAll( &foo) )
 	  {
-	    switch ( foo.type)
-	    {
-	      case Kulon:
-		iface = rs->getInterfaceForApp((foo.nport-1) * 16 + foo.port);
-		apparate[foo.num] = new kulon(foo, iface);
-		if (iface)
-		{
-		  apparate[foo.num]->isOn=true;
-		}
-	      break;
-	      case Serdolik:
-		
-		if ( !db->getUiIp( &ip, foo.num ))
-		  throw ( "Dont't find foo.num =  " + LexicalCaster(foo.num));
-		ifaceDcm  = new UiTcpArp (ip) ;
-		TcpManage->addUi( ifaceDcm );
-		
-		apparate[foo.num] = new serdolik(foo, ifaceDcm);
-		apparate[foo.num]->isOn=true;
-		break;
-	      default:
-		throw ( std::string (" Don't know apparate type") + LexicalCaster(foo.type) );
-	    }
+	    appMng->addApparate( foo  );
 	  }
      }
      catch ( std::string e)
@@ -190,7 +150,7 @@ int main(int argc, char **argv)
        n = new int (i);
        pthread_create(&pthread_ARPU[*n], NULL, pthreadARPU, n);
      }; */   
-     TcpManage->start();
+     SKLib::Singleton<UIservice::TCPServerManage>::getInstance().start();
      
      return 0;
 }
@@ -199,60 +159,48 @@ int main(int argc, char **argv)
 void* pthreadReceiver(void *unused)
 {    
   UNUSED ( unused ) ;
-     int sockfd, sock_new, len, ret;
+     int len;
      struct kg buf;
-
+    tcpReciever * tctrecv;
      SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+      Log->log("pthreadReceiver started!");
+     try
+     {
+	tctrecv = new tcpReciever(7000);
+     } catch( std::string e)
+	{
+	  Log->log() << "pthreadReceiver ERROR :::: "<< e; 
+	  return NULL;
+	}
 
      
-     sockfd = make_socket(7000);
-
-     Log->log("pthreadReceiver started!");
 
      while (1)
      {
-	ret = listen(sockfd, 50);
-	if (ret == -1)
-	{
-	      Log->log("listen(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	sock_new = accept(sockfd, NULL, NULL);
-	if (sock_new == -1)
-	{
-	      Log->log("accept(): " + std::string(strerror(errno)));
-	      continue;
-	}
-	
-      //  len = recv(sock_new, &buf, sizeof(struct kg), 0);
-      //  close(sock_new);
-	while( (len=recv(sock_new, &buf, sizeof(struct kg), 0)) >0 )
+	len = tctrecv->recvMes( (char *)&buf, sizeof(struct kg) );
+	while( len >0 )
 	{ 
-	if (len == sizeof(struct kg))
-	{  
-	  Log->log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
-	      
-	      if (buf.number >= 1 && buf.number <= 48)
-	      {
-		if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
-		{ 
-		    apparate[buf.number]->checkNewMessage(buf);
-		    apparate[buf.number]->setPrio(1);
-		} else  
-		  {
-			Log->log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
-			reSetInterfece(buf);
+	  if (len == sizeof(struct kg))
+	  {  
+	    Log->log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
+		
+		if (buf.number >= 1 && buf.number <= 48)
+		{
+		  if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
+		  { 
+		    appMng->newMessage (buf);
+		  } 
+		    else  
+		    {
+			  Log->log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
+			  appMng->reSetInterfece(buf);
+		  }
+	    //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
 		}
-	  //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
-	      }
-	      else
-	    Log->log("ERROR: buf.number = " + LexicalCaster(buf.number));
-	}
-     }
-     close( sock_new );
-  // else
-  //     Log->log("buffer too short");
+		else
+	      Log->log("ERROR: buf.number = " + LexicalCaster(buf.number));
+	  }
+        }
      }
      return NULL;
 }
@@ -262,35 +210,25 @@ void* pthreadReceiver(void *unused)
 void* pthreadChangeKeys(void *unused)
 {
   UNUSED ( unused);
-     int sock_new, ret;
+     int  ret;
      struct kg buf, kdg;
      ushort num;
      std::ostringstream os;
-     
-     int sockfd = make_socket(7001);
-      
-     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+    tcpReciever * tctrecv;
+    SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+     try
+     {
+       tctrecv = new tcpReciever(7001);
+     } catch( std::string e)
+	{
+	  Log->log() << "pthreadChangeKeys ERROR :::: "<< e; 
+	  return NULL;
+	}
      Log->log("pthreadChangeKeys started!");
 
      while (1)
      {
-	ret = listen(sockfd, 10);
-	if (ret < 0)
-	{
-	      Log->log("listen(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	sock_new = accept(sockfd, NULL, NULL);
-	if (sock_new < 0)
-	{
-	      Log->log("accept(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	ret = recv(sock_new, &buf, sizeof(struct kg), 0);
-	close(sock_new);
-	
+ 	ret = tctrecv->recvMes( (char *) &buf, sizeof(struct kg) );
 	if (ret == sizeof(struct kg))
 	{
 	      Log->log("pthreadChangeKeys: KZN=" + LexicalCaster(buf.number));
@@ -308,15 +246,11 @@ void* pthreadChangeKeys(void *unused)
 	//-------------------------------------------------
 	
 	while (db_main->getNumSARPU( &num, buf.number,CHANGE_KEYS_WITHOUT_LSMENA ))
-	{
-	    if (apparate[num]->isOn)
-	    {   
+	{   
 	      kdg.number = num;
 	      kdg.command = CMD_NEXT_KEY;
 	      kdg.param = buf.param;
-	      apparate[num]->checkNewMessage(kdg);
-	      apparate[num]->setPrio(1);
-	    }
+	      appMng->newMessage( kdg );
 	    //  prAppLst[getThreadIndexForNum(num)]->add(num);
 	}
 
@@ -330,59 +264,50 @@ void* pthreadChangeKeys(void *unused)
 void* pthreadBlockKulons(void *unused)
 {
   UNUSED ( unused);
-     int sockfd, sock_new, ret;
+     int  ret;
      ushort num, buf[4];
      struct kg kdg;
-     
-     sockfd = make_socket(7006);
-    
+     tcpReciever * tctrecv;
      SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+     try
+     {
+       tctrecv = new tcpReciever(7006);
+     } catch( std::string e)
+	{
+	  Log->log() << "pthreadBlockKulons ERROR :::: "<< e; 
+	  return NULL;
+	}
      Log->log("pthreadBlockKulons started!");
 
      while (1)
      {
-	ret = listen(sockfd, 10);
-	if (ret < 0)
-	{
-	      Log->log("listen(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	sock_new = accept(sockfd, NULL, NULL);
-	if (sock_new < 0)
-	{
-	      Log->log("accept(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	ret = recv(sock_new, &buf, 8, 0);
-	close(sock_new);
-	
-	if (ret == 8)
-	{
-	      if ((buf[0] != 0xFEFE) || (buf[3] != 0xEFEF))
-	      {
-	    close(sock_new);
-	    continue;
-	      }
-	      
-	      Log->log("pthreadBlockKulons: receive KZN=" + LexicalCaster(buf[1])
-	      + " status=" + LexicalCaster(buf[2]));
-	}
-	else
-	      continue;
-
-	while (db_main->getNumSARPU( &num, buf[1]))
-	{
-	    if (apparate[num]->isOn)
-	    {  
-	      kdg.number = num;
-	      kdg.command = (buf[2] == 1 ? CMD_SET : CMD_UNSET);
-	      kdg.param = APP_ZSBA;
-	      apparate[num]->checkNewMessage(kdg);
-	      apparate[num]->setPrio(1);
+       try
+       {
+	    ret = tctrecv->recvMes( (char*) buf, 8);
+	    if (ret == 8)
+	    {
+		  if ((buf[0] != 0xFEFE) || (buf[3] != 0xEFEF))
+		  {
+			continue;
+		  }
+		  
+		  Log->log("pthreadBlockKulons: receive KZN=" + LexicalCaster(buf[1])
+		  + " status=" + LexicalCaster(buf[2]));
 	    }
-	    //  prAppLst[getThreadIndexForNum(num)]->add(num);
+	    else
+		  continue;
+
+	    while (db_main->getNumSARPU( &num, buf[1]))
+	    {  
+		  kdg.number = num;
+		  kdg.command = (buf[2] == 1 ? CMD_SET : CMD_UNSET);
+		  kdg.param = APP_ZSBA;
+		  appMng->newMessage( kdg );
+		//  prAppLst[getThreadIndexForNum(num)]->add(num);
+	    }
+       }catch ( std::string e)
+	{
+	  Log->log() << "pthreadBlockKulons ERROR :::: "<< e; 
 	}
      }
    return NULL;
@@ -391,35 +316,21 @@ void* pthreadBlockKulons(void *unused)
 void sig_handler(int signum)
 {
   UNUSED ( signum);
-  SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
      if (mainThreadPid != getpid())
      {
-      Log->log("----- hello! I'am thread. -----");
+      SKLib::LogSingleton::getInstance().log("----- hello! I'am thread. -----");
       pthread_exit(NULL);
       return;
      }
 
-     sleep(5);
-
- //    for (int i = 0; i < 10; i++)
-//   delete prAppLst[i];
-
-//      pthread_mutex_destroy(&Apparate::updateMutex);
-
-     
-     // Delete dynamic objects.
-     for (int i = 1; i < NDEV; i++)
-      delete apparate[i];
-
      delete db_main;
 
-     delete rs;
 
      exit(0);
 }
 
 void* pthreadARPU (void * _arg)
-{
+{/*
  int *buf = (int *) _arg;
  int n = *buf;
      delete buf;
@@ -428,7 +339,7 @@ void* pthreadARPU (void * _arg)
   {
    apparate[n]->update_prio(0); 
    usleep(1);
-  }
+  }*/
   return NULL;
 }
 
@@ -437,94 +348,18 @@ void* pthreadARPU (void * _arg)
 void* pthreadNPort(void * _arg)
 {
      int *buf = (int *) _arg;
- int n = *buf;
+      int n = *buf;
      delete buf;
-     int low, high;
-     int jj;
      
-     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
-     Log->log("pthreadNPort(" + LexicalCaster(n) + ")");
+     SKLib::LogSingleton::getInstance().log("pthreadNPort(" + LexicalCaster(n) + ")");
       sleep( 3 );
-     switch( n )
-     {	
-	case 0:
-		 low=1;
-               high=8;				 
-		 break;
-	 case 1: 
-		 low=9;
-               high=20;
-		 break;
-	 case 2:
-		 low=21;
-               high=32;
-		 break;
-	 case 3: 	
-		 low=33;
-               high=40;
-		 break;
-	 case 4:
-		 low=41;
-               high=44;
-		 break;
-	 case 5: 
-		 low=45;
-               high=48;
-		 break;
-	 default:
-		 return NULL;
-      }   		 
-
-   
-
-  //   prAppLst[n] = new PriorityApparateList();
-     
-     while (1)
-     {
-      for (int i = low; i <= high; i++)
-       {    // опрашивать аппараты с приоритетом >= 1
-        for(  jj = low; jj<=high; jj++)  
-         {      
-	       upd_high_prio_apparate( low, high ); // опрашивать аппараты с приоритетом >= 2
-               apparate[jj]->update_prio(1 ); // в update() проверка: оставлять ли приоритет
-         }
-     
-        apparate[i]->update_prio(0);
-        usleep(1);  
-       }
-     }
-     return NULL;
-}
-// опрашивать аппараты с приоритетом >= 2
-void  upd_high_prio_apparate(  int  low, int  high )
-{ 
-  int  i, pri;  
-    do{ 
-      pri=0;
-      for(  i = low; i<=high; i++)  
-         pri += apparate[i]->update_prio(2);      
-    }  while( pri>0 );       
-    usleep(1);    
-}
-
-void reSetInterfece(kg & buf)
-{
-  SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
-  if (buf.number>=41 && buf.number<=48)
-      return;
-     ushort port=buf.param % 100;
-     ushort nport=buf.param / 100;
-      SKLib::DataInterface * iface;
-     Log->log("ReSetInterfese  :: num= " + LexicalCaster(buf.number) + ", nport = "+ LexicalCaster(nport) +
-	      " port = "+ LexicalCaster(port));
-     pthread_mutex_lock(&(apparate[buf.number]->updateMutex));  
-
-     if ( port && nport && ( iface = rs->getInterfaceForApp((nport-1) * 16 + port)) )  
+      try
       {
- 	  ((kulon* )apparate[buf.number])->setDataInterface(iface);
-	  apparate[buf.number]->isOn=true; 
-      } else        
-	  apparate[buf.number]->isOn=false; //делаем так что бы больше не опрашивать
-
-     pthread_mutex_unlock(&(apparate[buf.number]->updateMutex));
+	appMng->updApparate( n );
+      } catch ( std:: string e)
+      {
+	SKLib::LogSingleton::getInstance().log()<< "EROOR !!!! " << e ;
+      }
+      
+     return NULL;
 }

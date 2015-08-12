@@ -435,7 +435,7 @@ void Apparate::commandLsmena(ushort p)
 	LSMENA = p;
 }
 
-ApparateType Apparate::getType() const
+Apparate::ApparateType Apparate::getType() const
 {
      return static_cast<ApparateType>(cfg.type);
 }

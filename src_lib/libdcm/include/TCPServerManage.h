@@ -18,7 +18,7 @@ namespace UIservice
       BACKLOG = 10     // как много может быть ожидающих соединений
     };
   public:
-    TCPServerManage(const std::string _port);
+    TCPServerManage(const std::string _port = "4001");
     ~TCPServerManage();
     virtual void start();
   private:

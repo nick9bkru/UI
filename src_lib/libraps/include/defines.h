@@ -60,18 +60,6 @@ enum
 };
 
 /**
-   \enum deviceType
-   \brief Определение типов используемых аппаратов.
- */
-enum ApparateType
-{
-     Argun = 10,   ///< Аргунь.
-     Delta = 20,   ///< Дельта.
-     Kulon = 30,   ///< Кулон.
-     Serdolik = 40 ///< Сердолик.
-};
-
-/**
    \enum DeviceType
    \brief Тип опрашиваемого устройства.
 */

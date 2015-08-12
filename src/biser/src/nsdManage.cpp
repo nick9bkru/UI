@@ -88,7 +88,6 @@ int nsdManage::selectAll ()
 	  {
 // 	    std::cout << " select  ip ==   " << (*it)->getInfo() << " fd = " << (*it)->getFd()  << std::endl;
 	    maxFd = std::max ( maxFd, (*it)->getFd());
-	    FD_SET((*it)->getFd(), &rfds);
 	  };
 	};
 	
