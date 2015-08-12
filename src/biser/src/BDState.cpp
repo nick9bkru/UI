@@ -31,3 +31,4 @@ bool BDState::setSostUi( std::string ip, bool state )
   SKLib::LogSingleton::getInstance().log()<< querry;
   return b ;
 };
+

@@ -272,4 +272,5 @@ void kulon::setDataInterface(SKLib::DataInterface * _iface)
 {
 	log1("setDataInterface(): ");
      iface = _iface;
-}
+};
+

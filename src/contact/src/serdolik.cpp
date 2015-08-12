@@ -181,4 +181,5 @@ void serdolik::commandBlock(ushort p)
      updateTables();
      
      sendCuuChanges();
-}
+};
+

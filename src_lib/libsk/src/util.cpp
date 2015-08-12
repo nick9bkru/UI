@@ -123,4 +123,4 @@ std::string removeLastChar(std::string str)
      std::string s = str;
      s.resize(s.size() - 1);
      return s;
-}
+};

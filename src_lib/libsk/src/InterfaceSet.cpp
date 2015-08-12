@@ -154,3 +154,4 @@ void InterfaceSet::writeToBd( int np, bool b, int active)
   SKLib::LogSingleton::getInstance().log(os);
   return;
 };
+

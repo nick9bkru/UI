@@ -36,3 +36,4 @@ SKLib::DataInterface * RapsodiaSet::getInterfaceForApp(int num)
   }
   return  NULL;		
 };
+

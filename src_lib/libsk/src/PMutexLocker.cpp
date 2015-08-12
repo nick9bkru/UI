@@ -40,4 +40,5 @@ PMutexLocker::PMutexLocker(pthread_mutex_t &_mutex) : mutex (_mutex)
 PMutexLocker::~PMutexLocker()
 {
   pthread_mutex_unlock(&mutex);
-}
+};
+

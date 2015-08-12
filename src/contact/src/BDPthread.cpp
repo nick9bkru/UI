@@ -155,4 +155,6 @@ bool BDPthread::getUiIp( std::string * str, const ushort num )
    pthread_mutex_unlock(&dbMutex);
    *str = std::string(ip);
    return ok;
-}
+};
+
+

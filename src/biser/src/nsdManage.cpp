@@ -130,3 +130,4 @@ UIservice::TCPManage::UiVec nsdManage::getUiVec() const
 {
   return Dcm;
 };
+

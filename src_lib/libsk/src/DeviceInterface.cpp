@@ -122,4 +122,4 @@ int DeviceInterface::i7k_send_readt(int fd, const char * const cmd, char * const
 
 	*texp = _time_get_tod() - t_start;
 	return (r);
-}
+};

@@ -586,4 +586,5 @@ int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
      close(sockfd);
 
      return 1;
-}
+};
+

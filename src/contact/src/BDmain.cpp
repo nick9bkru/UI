@@ -64,4 +64,5 @@ bool BDmain::getNumSARPU( ushort * num,const ushort kzn   )
   std::ostringstream query;
   query << "select NUM from SA_RPU where KZN= " << kzn <<" and KOD=30 order by NUM;";
   return db->multipleSelect(query.str(), num, sizeof(ushort));
-}
+};
+

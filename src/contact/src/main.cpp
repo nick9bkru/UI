@@ -527,4 +527,4 @@ void reSetInterfece(kg & buf)
 	  apparate[buf.number]->isOn=false; //делаем так что бы больше не опрашивать
 
      pthread_mutex_unlock(&(apparate[buf.number]->updateMutex));
-}
+};
