@@ -5,7 +5,7 @@ RapsodiaSet::RapsodiaSet():InterfaceSet()
   for ( int j = 0; j < 4; j++)
     for ( int i = 1; i <= 16; i++)
 	add(j,new SKLib::TCPSocketInterface( 50000 + i));
-  SKLib::Log* Log =  &SKLib::LogSingleton::Singleton::getInstance();
+  SKLib::Log* Log =  &SKLib::LogSingleton::getInstance();
   Log->log("RapsodiaSet::mmap.size() = " + LexicalCaster(mmap.size()));
 
 //         std::vector<SKLib::DataInterface *>::iterator iter = vec.begin();

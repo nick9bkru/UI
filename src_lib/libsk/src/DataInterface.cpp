@@ -6,7 +6,7 @@ using namespace SKLib;
 
 DataInterface::DataInterface(): timeout(50000), fd(-1), answerSize(64)
 {
-  log = &SKLib::LogSingleton::Singleton::getInstance();
+  log = &SKLib::LogSingleton::getInstance();
 }
 
 DataInterface::~DataInterface()

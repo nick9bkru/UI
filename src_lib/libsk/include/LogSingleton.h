@@ -9,7 +9,7 @@ namespace SKLib
     class LogSingleton : public Singleton <SKLib::Log>
     {
       public:
-	static SKLib::Log& getInstance( std::string nameLog );
+	static SKLib::Log& getInstance( std::string nameLog = "" );
       private:
 	LogSingleton();
 	LogSingleton(const LogSingleton& );
