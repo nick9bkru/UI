@@ -16,7 +16,7 @@ BDPthread::BDPthread(std::string host, std::string namebd)
     delete db;
     throw ( std::string (" Don't open BD"));
   };
-  Log =  &SKLib::LogSingleton::Singleton::getInstance();
+  Log =  &SKLib::LogSingleton::getInstance();
 }
 
 BDPthread::~BDPthread()

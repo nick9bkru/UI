@@ -6,7 +6,7 @@ UiTcp::UiTcp(std::string _ip, int _port) :  UIservice::UiTcp (_ip, _port)
  TIMEINTERVAL = 10000000; //1 секунды 
  TIMENEXTASK = 100000;
  countNewMsg= 0;
- Log = &SKLib::LogSingleton::Singleton::getInstance();
+ Log = &SKLib::LogSingleton::getInstance();
 }
 
 UiTcp::~UiTcp()

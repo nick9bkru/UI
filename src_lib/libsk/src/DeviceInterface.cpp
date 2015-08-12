@@ -2,7 +2,7 @@
 
 using namespace SKLib;
 
-extern Log log;
+//extern Log log;
 
 DeviceInterface::DeviceInterface(const std::string & _device)
      : DataInterface(), device(_device)

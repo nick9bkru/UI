@@ -19,7 +19,7 @@ Apparate::Apparate(struct sa_info _cfg):
      NextKey(0), dcCall(0), dcNeedSendCall(0)
 {
      pthread_mutex_init(&updateMutex, NULL);
-     Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     Log =  &SKLib::LogSingleton::getInstance();
      db = &SKLib::Singleton<BDPthread>::getInstance();
 
      init(INIT_FULL);
@@ -562,7 +562,7 @@ void  Apparate::setPrio(int  val)
 
 int sendUDPMessage(const char * destIP, int destPort, ushort *arr, int len)
 {
-//      SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+//      SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
      struct sockaddr_in dest;
      dest.sin_family = AF_INET;
      dest.sin_port = htons(destPort);

@@ -17,7 +17,7 @@ bool BDState::setSostUi( int numUi, bool state )
   pthread_mutex_lock(&mutexdb);
   bool b = db->notSelect( querry.str() ) ;
   pthread_mutex_unlock(&mutexdb);
-  SKLib::LogSingleton::Singleton::getInstance().log()<< querry;
+  SKLib::LogSingleton::getInstance().log()<< querry;
   return b ;
 };
 
@@ -28,6 +28,6 @@ bool BDState::setSostUi( std::string ip, bool state )
   pthread_mutex_lock(&mutexdb);
   bool b = db->notSelect( querry.str() ) ;
   pthread_mutex_unlock(&mutexdb);
-  SKLib::LogSingleton::Singleton::getInstance().log()<< querry;
+  SKLib::LogSingleton::getInstance().log()<< querry;
   return b ;
 };

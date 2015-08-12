@@ -202,7 +202,7 @@ void* pthreadReceiver(void *unused)
      int sockfd, sock_new, len, ret;
      struct kg buf;
 
-     SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
 
      
      sockfd = make_socket(7000);
@@ -269,7 +269,7 @@ void* pthreadChangeKeys(void *unused)
      
      int sockfd = make_socket(7001);
       
-     SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
      Log->log("pthreadChangeKeys started!");
 
      while (1)
@@ -336,7 +336,7 @@ void* pthreadBlockKulons(void *unused)
      
      sockfd = make_socket(7006);
     
-     SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
      Log->log("pthreadBlockKulons started!");
 
      while (1)
@@ -391,7 +391,7 @@ void* pthreadBlockKulons(void *unused)
 void sig_handler(int signum)
 {
   UNUSED ( signum);
-  SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+  SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
      if (mainThreadPid != getpid())
      {
       Log->log("----- hello! I'am thread. -----");
@@ -423,7 +423,7 @@ void* pthreadARPU (void * _arg)
  int *buf = (int *) _arg;
  int n = *buf;
      delete buf;
-  SKLib::LogSingleton::Singleton::getInstance().log("pthreadARPU(" + LexicalCaster(n) + ")");
+  SKLib::LogSingleton::getInstance().log("pthreadARPU(" + LexicalCaster(n) + ")");
   for (;;)
   {
    apparate[n]->update_prio(0); 
@@ -442,7 +442,7 @@ void* pthreadNPort(void * _arg)
      int low, high;
      int jj;
      
-     SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
      Log->log("pthreadNPort(" + LexicalCaster(n) + ")");
       sleep( 3 );
      switch( n )
@@ -509,7 +509,7 @@ void  upd_high_prio_apparate(  int  low, int  high )
 
 void reSetInterfece(kg & buf)
 {
-  SKLib::Log *Log =  &SKLib::LogSingleton::Singleton::getInstance();
+  SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
   if (buf.number>=41 && buf.number<=48)
       return;
      ushort port=buf.param % 100;

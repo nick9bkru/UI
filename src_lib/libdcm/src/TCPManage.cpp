@@ -7,7 +7,7 @@ TCPManage::TCPManage()
 { 
 //    std::cout << "Constructor TCPManage::TCPManage() !!!!! " << std::endl;
    AllUi.clear();
-   Log =  &SKLib::LogSingleton::Singleton::getInstance();
+   Log =  &SKLib::LogSingleton::getInstance();
 }
 
 TCPManage::~TCPManage()

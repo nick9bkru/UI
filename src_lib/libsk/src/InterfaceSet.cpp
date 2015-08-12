@@ -8,7 +8,7 @@ NPortDI InterfaceSet::mmap;
 
 InterfaceSet::InterfaceSet()
 {   
-  //log = &SKLib::LogSingleton::Singleton::getInstance();
+  //log = &SKLib::LogSingleton::getInstance();
 }
 
 InterfaceSet::~InterfaceSet()
@@ -16,7 +16,7 @@ InterfaceSet::~InterfaceSet()
      for (NPortDI::iterator it = mmap.begin(); it != mmap.end(); it++)
 	  delete (it->second);
   
-     SKLib::LogSingleton::Singleton::getInstance().log("~InterfaceSet()");
+     SKLib::LogSingleton::getInstance().log("~InterfaceSet()");
 }
 
 void InterfaceSet::add(int nport, DataInterface *ai)
@@ -40,7 +40,7 @@ void InterfaceSet::start() const
 void InterfaceSet::openAll(const std::string & ipAddr, int nport, bool restart)
 {   DataInterface *ai;
      std::ostringstream os;
-     Log * log = &SKLib::LogSingleton::Singleton::getInstance();
+     Log * log = &SKLib::LogSingleton::getInstance();
     // log.log("InterfaceSet::openAll() IP="+ ipAddr);
 	 
      pair< NPortDI::iterator, NPortDI::iterator > p;	 
@@ -66,7 +66,7 @@ void* InterfaceSet::pthreadFunc(void* arg)
      pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
      int  np = *(int *)arg;  // np 0-3
      delete (int *)arg;
-     Log * log = &SKLib::LogSingleton::Singleton::getInstance();
+     Log * log = &SKLib::LogSingleton::getInstance();
      
       std::ostringstream  os, oip1, oip2;
      
@@ -141,7 +141,7 @@ int InterfaceSet::rstNport( int np, int active)
   int ret = system ( command.c_str() );
   oip.str("");
   oip << "ret=" << ret << command << strerror( errno );
-  SKLib::LogSingleton::Singleton::getInstance().log(oip);
+  SKLib::LogSingleton::getInstance().log(oip);
   return ret;
 };
 
@@ -151,6 +151,6 @@ void InterfaceSet::writeToBd( int np, bool b, int active)
      
   os << "echo \"select wr_ssvaz_nport(1" << np << (b ? ",1,0," : ",0,1,")<< (active+1) << " );\" | psql -d frag_pgdb";
   system(  os.str().c_str() );
-  SKLib::LogSingleton::Singleton::getInstance().log(os);
+  SKLib::LogSingleton::getInstance().log(os);
   return;
 };
