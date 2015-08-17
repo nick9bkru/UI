@@ -2,7 +2,7 @@
 
 BDStateUps::BDStateUps(Database * _db): BDState(_db)
 {
-
+    //clearUps( );
 }
 
 BDStateUps::~BDStateUps()
@@ -46,3 +46,15 @@ bool BDStateUps::setUpsState( int numUi, int cont, int state )
   pthread_mutex_unlock(&mutexdb);
   return b ;
 };
+
+bool BDStateUps::clearUps( )
+{
+  std::ostringstream querry;
+  querry << " update ups set sost = 0 ;";
+  pthread_mutex_lock(&mutexdb);
+  bool b = db->notSelect( querry.str() ) ;
+  pthread_mutex_unlock(&mutexdb);
+  return b ;
+};
+
+

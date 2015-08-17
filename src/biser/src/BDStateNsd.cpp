@@ -29,18 +29,18 @@ int BDStateNsd::getNSDstate( std::string ip, int cont )
   int ret ;
   
   std::ostringstream querry;
-  querry << "select state from nsd where ui_contact =" << cont << " and ui = (\
+  querry << "select IN_SIGNAL from nsd where ui_contact =" << cont << " and ui = (\
       select index from ui_ip where ip = '" << ip << "');";
   pthread_mutex_lock(&mutexdb);
   bool b = db->singleSelect( querry.str() , &ret, sizeof(ret) );
   pthread_mutex_unlock(&mutexdb);
-  return  b ? ret : -1;
+  return  b ? --ret : -1;
 };
 
 bool BDStateNsd::setNsdState( std::string ip, int cont, int state )
 {
   std::ostringstream querry;
-  querry << " update nsd set state = " << state << " where ui_contact = " << cont<<
+  querry << " update nsd set IN_SIGNAL = " << ++state << " where ui_contact = " << cont<<
 	      " and ui = ( select index from ui_ip where ip = '" << ip << "');";
 // std::cout << querry.str() << std::endl;	      
   pthread_mutex_lock(&mutexdb);
@@ -52,7 +52,7 @@ bool BDStateNsd::setNsdState( std::string ip, int cont, int state )
 bool BDStateNsd::setNsdState( int numUi, int cont, int state )
 {
   std::ostringstream querry;
-  querry << " update nsd set state = " << state << " where ui_contact = " << cont<<
+  querry << " update nsd set IN_SIGNAL = " << ++state << " where ui_contact = " << cont<<
 	      " and ui =" << numUi << " ;";
   pthread_mutex_lock(&mutexdb);
   bool b = db->notSelect( querry.str() ) ;

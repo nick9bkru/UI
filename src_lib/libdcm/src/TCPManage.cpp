@@ -27,4 +27,5 @@ void TCPManage::stop ()
 {
   Log->log() << " TCPManage::stop ()   " ;
   IsWork = 0;
-}
+};
+

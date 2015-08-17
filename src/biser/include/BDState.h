@@ -24,6 +24,8 @@ public:
   // работает УИ или нет!
   bool setSostUi( int numUi, bool state );
   bool setSostUi( std::string ip, bool state );
+  
+ bool rstSostUi( );
 protected:
   pthread_mutex_t mutexdb;
   Database *db;

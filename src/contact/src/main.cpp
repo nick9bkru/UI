@@ -132,7 +132,7 @@ int main(int argc, char **argv)
      sigemptyset(&sigs_to_block);
      sigaddset(&sigs_to_block, SIGPIPE);
      pthread_sigmask(SIG_BLOCK, &sigs_to_block, NULL);
-     UIservice::TCPServerManage * TcpManage = new UIservice::TCPServerManage ( std::string( "4002") );
+     UIservice::TCPServerManage * TcpManage = new UIservice::TCPServerManage ( 4002 );
      
      struct sa_info foo;
      SKLib::DataInterface * iface;

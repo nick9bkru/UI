@@ -64,7 +64,7 @@ void Log::setDebugMode(DebugMode dm)
      debugMode = dm;
      
      if (debugMode == DebugToFile)
-	  logStream.open(fileName.c_str(),  std::ios::app| std::ios::out | std::ios::trunc);
+	  logStream.open(fileName.c_str(),  /*std::ios::app| */std::ios::out | std::ios::trunc);
 }
 
 Log::~Log()

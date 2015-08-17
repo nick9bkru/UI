@@ -1,3 +1,4 @@
+
 /**
    \file apparate.cpp
    \brief Реализация класса Apparate.

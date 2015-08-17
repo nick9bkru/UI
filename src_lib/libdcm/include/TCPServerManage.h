@@ -18,14 +18,14 @@ namespace UIservice
       BACKLOG = 10     // как много может быть ожидающих соединений
     };
   public:
-    TCPServerManage(const std::string _port);
+    TCPServerManage(const int _port);
     ~TCPServerManage();
     virtual void start();
   private:
     void connect( const int fd, const std::string ip);
     void init();
     int sockfd;
-    std::string port;
+    int port;
   };
 
 }

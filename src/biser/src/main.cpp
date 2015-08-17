@@ -97,7 +97,7 @@ int main(int argc, char **argv)
   
   try
   {
-      TcpMng = new UIservice::TCPServerManage("4001");
+      TcpMng = new UIservice::TCPServerManage(4001);
     ///<  Идентификаторы потока
      
       pthread_create(&pidPthreadTcmMng, NULL, pthreadTcpMng, NULL); 
