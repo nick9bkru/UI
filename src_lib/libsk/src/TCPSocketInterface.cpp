@@ -151,8 +151,6 @@ int TCPSocketInterface::onlyRead(void *answer, int size)
 	       log->log("EPIPE in recv()");
 	       this->close();
 	  }
-	  
-	  return -1;
      }
 
      return ret;

@@ -23,6 +23,7 @@ public:
   bool isConnect( const ushort num, const bool rk = false);
   bool updSARPUKonf( const ushort p, const ushort num);
   bool getUiIp( std::string * str, const ushort num );
+  bool setUistate( const std::string ip, const int state );
 private:
   SKLib::Log *Log ;
   Database *db;

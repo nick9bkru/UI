@@ -49,7 +49,7 @@ protected:
 private:
   int answAndGet( const std::string cmd, bool Inv = true);
   Mutex mtx ;
-
+time_t timeNoRead;
   
 };
 

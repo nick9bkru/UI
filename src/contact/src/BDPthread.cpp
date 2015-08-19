@@ -157,4 +157,15 @@ bool BDPthread::getUiIp( std::string * str, const ushort num )
    return ok;
 };
 
+bool BDPthread::setUistate( const std::string ip, const int state )
+{
+  std::ostringstream query;
+  query << "UPDATE ui_ip set sost = " << state <<" where ip = '" << ip << "' ;";
+
+   pthread_mutex_lock(&dbMutex);
+   bool ok = db->notSelect(query.str());
+   pthread_mutex_unlock(&dbMutex);
+   return ok;
+};
+
 
