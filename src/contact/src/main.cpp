@@ -20,6 +20,7 @@
 #include "RapsodiaSet.h"
 #include "BDmain.h"
 #include "TCPServerManage.h"
+#include "tcpReciever.h"
 
 #include "LogSingleton.h"
 
@@ -199,60 +200,51 @@ int main(int argc, char **argv)
 void* pthreadReceiver(void *unused)
 {    
   UNUSED ( unused ) ;
-     int sockfd, sock_new, len, ret;
+     int len;
      struct kg buf;
-
+     
+    tcpReciever * tctrecv;
      SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+      Log->log("pthreadReceiver started!");
+     try
+     {
+	tctrecv = new tcpReciever(7000);
+     } catch( std::string e)
+	{
+	  Log->log() << "pthreadReceiver ERROR :::: "<< e; 
+	  return NULL;
+	}
 
      
-     sockfd = make_socket(7000);
-
-     Log->log("pthreadReceiver started!");
-
      while (1)
      {
-	ret = listen(sockfd, 50);
-	if (ret == -1)
-	{
-	      Log->log("listen(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	sock_new = accept(sockfd, NULL, NULL);
-	if (sock_new == -1)
-	{
-	      Log->log("accept(): " + std::string(strerror(errno)));
-	      continue;
-	}
+       len = tctrecv->recvMes( (char *)&buf, sizeof(struct kg) );
 	
       //  len = recv(sock_new, &buf, sizeof(struct kg), 0);
       //  close(sock_new);
-	while( (len=recv(sock_new, &buf, sizeof(struct kg), 0)) >0 )
+	while( len > 0 )
 	{ 
-	if (len == sizeof(struct kg))
-	{  
-	  Log->log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
-	      
-	      if (buf.number >= 1 && buf.number <= 48)
-	      {
-		if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
-		{ 
-		    apparate[buf.number]->checkNewMessage(buf);
-		    apparate[buf.number]->setPrio(1);
-		} else  
-		  {
-			Log->log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
-			reSetInterfece(buf);
+	  if (len == sizeof(struct kg))
+	  {  
+	    Log->log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
+		
+		if (buf.number >= 1 && buf.number <= 48)
+		{
+		  if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
+		  { 
+		      apparate[buf.number]->checkNewMessage(buf);
+		      apparate[buf.number]->setPrio(1);
+		  } else  
+		    {
+			  Log->log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
+			  reSetInterfece(buf);
+		  }
+	    //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
 		}
-	  //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
-	      }
-	      else
-	    Log->log("ERROR: buf.number = " + LexicalCaster(buf.number));
+		else
+	      Log->log("ERROR: buf.number = " + LexicalCaster(buf.number));
+	  }
 	}
-     }
-     close( sock_new );
-  // else
-  //     Log->log("buffer too short");
      }
      return NULL;
 }
@@ -262,34 +254,26 @@ void* pthreadReceiver(void *unused)
 void* pthreadChangeKeys(void *unused)
 {
   UNUSED ( unused);
-     int sock_new, ret;
+     int ret;
      struct kg buf, kdg;
      ushort num;
      std::ostringstream os;
      
-     int sockfd = make_socket(7001);
-      
-     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+    tcpReciever * tctrecv;
+    SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+     try
+     {
+       tctrecv = new tcpReciever(7001);
+     } catch( std::string e)
+	{
+	  Log->log() << "pthreadChangeKeys ERROR :::: "<< e; 
+	  return NULL;
+	}
      Log->log("pthreadChangeKeys started!");
 
      while (1)
      {
-	ret = listen(sockfd, 10);
-	if (ret < 0)
-	{
-	      Log->log("listen(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	sock_new = accept(sockfd, NULL, NULL);
-	if (sock_new < 0)
-	{
-	      Log->log("accept(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	ret = recv(sock_new, &buf, sizeof(struct kg), 0);
-	close(sock_new);
+	ret = tctrecv->recvMes( (char *) &buf, sizeof(struct kg) );
 	
 	if (ret == sizeof(struct kg))
 	{
@@ -330,59 +314,56 @@ void* pthreadChangeKeys(void *unused)
 void* pthreadBlockKulons(void *unused)
 {
   UNUSED ( unused);
-     int sockfd, sock_new, ret;
+     int ret;
      ushort num, buf[4];
      struct kg kdg;
      
-     sockfd = make_socket(7006);
-    
+     tcpReciever * tctrecv;
      SKLib::Log *Log =  &SKLib::LogSingleton::getInstance();
+     try
+     {
+       tctrecv = new tcpReciever(7006);
+     } catch( std::string e)
+	{
+	  Log->log() << "pthreadBlockKulons ERROR :::: "<< e; 
+	  return NULL;
+	}
      Log->log("pthreadBlockKulons started!");
 
      while (1)
      {
-	ret = listen(sockfd, 10);
-	if (ret < 0)
-	{
-	      Log->log("listen(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	sock_new = accept(sockfd, NULL, NULL);
-	if (sock_new < 0)
-	{
-	      Log->log("accept(): " + std::string(strerror(errno)));
-	      continue;
-	}
-
-	ret = recv(sock_new, &buf, 8, 0);
-	close(sock_new);
-	
-	if (ret == 8)
-	{
-	      if ((buf[0] != 0xFEFE) || (buf[3] != 0xEFEF))
-	      {
-	    close(sock_new);
-	    continue;
-	      }
-	      
-	      Log->log("pthreadBlockKulons: receive KZN=" + LexicalCaster(buf[1])
-	      + " status=" + LexicalCaster(buf[2]));
-	}
-	else
-	      continue;
-
-	while (db_main->getNumSARPU( &num, buf[1]))
-	{
-	    if (apparate[num]->isOn)
-	    {  
-	      kdg.number = num;
-	      kdg.command = (buf[2] == 1 ? CMD_SET : CMD_UNSET);
-	      kdg.param = APP_ZSBA;
-	      apparate[num]->checkNewMessage(kdg);
-	      apparate[num]->setPrio(1);
+       try
+       {
+	  ret = tctrecv->recvMes( (char*) buf, 8);
+	    
+	    if (ret == 8)
+	    {
+		  if ((buf[0] != 0xFEFE) || (buf[3] != 0xEFEF))
+		  {
+		    continue;
+		  }
+		  
+		  Log->log("pthreadBlockKulons: receive KZN=" + LexicalCaster(buf[1])
+		  + " status=" + LexicalCaster(buf[2]));
 	    }
-	    //  prAppLst[getThreadIndexForNum(num)]->add(num);
+	    else
+		  continue;
+
+	    while (db_main->getNumSARPU( &num, buf[1]))
+	    {
+		if (apparate[num]->isOn)
+		{  
+		  kdg.number = num;
+		  kdg.command = (buf[2] == 1 ? CMD_SET : CMD_UNSET);
+		  kdg.param = APP_ZSBA;
+		  apparate[num]->checkNewMessage(kdg);
+		  apparate[num]->setPrio(1);
+		}
+		//  prAppLst[getThreadIndexForNum(num)]->add(num);
+	    }
+	}catch ( std::string e)
+	{
+	  Log->log() << "pthreadBlockKulons ERROR :::: "<< e; 
 	}
      }
    return NULL;

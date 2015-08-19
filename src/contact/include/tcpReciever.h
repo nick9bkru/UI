@@ -16,6 +16,7 @@ public:
     ~tcpReciever();
     
     int recvMes( char * msg, const int len);
+     int getSock( ) const;
 private:
     int sockfd;
     int make_socket(int port);

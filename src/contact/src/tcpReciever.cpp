@@ -32,7 +32,11 @@ int tcpReciever::make_socket(int port)
 	  throw ( std::string ( " tcpReciever::make_socket bind " ) + std::string(strerror(errno))  );
 	
      }
-     
+     if (listen(sockfd, 50) == -1)
+      {
+	    throw ( std::string ( " tcpReciever::recvMes listen(): " ) + std::string(strerror(errno))  );
+	    sock = -1;
+      };
      return sock;
 }
 
@@ -40,12 +44,6 @@ int tcpReciever::recvMes( char * msg, const int len)
 {
   struct timeval tv;
   int sock_new ;
-  int ret = listen(sockfd, 50);
-  if (ret == -1)
-  {
-	throw ( std::string ( " tcpReciever::recvMes listen(): " ) + std::string(strerror(errno))  );
-	return -1;
-  };
 
   sock_new = accept(sockfd, NULL, NULL);
   if (sock_new == -1)
@@ -60,7 +58,7 @@ int tcpReciever::recvMes( char * msg, const int len)
   /* Ждем не больше пяти секунд. */
   tv.tv_sec = 5;
   tv.tv_usec = 0;
-  ret = select(sock_new + 1, &rfds, NULL, NULL, &tv);
+  int ret = select(sock_new + 1, &rfds, NULL, NULL, &tv);
   if ( ret < 0)
     throw ( std::string ( " tcpReciever::recvMes select(): " ) + std::string(strerror(errno))  ); 
   if ( ret && FD_ISSET( sock_new, &rfds ))
@@ -71,3 +69,7 @@ int tcpReciever::recvMes( char * msg, const int len)
   return ret;
 };
 
+int tcpReciever::getSock( ) const
+{
+  return sockfd;
+};
