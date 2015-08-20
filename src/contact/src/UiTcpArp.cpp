@@ -1,6 +1,8 @@
 #include "UiTcpArp.h"
 #include "BDPthread.h"
 
+#include <sys/select.h>
+
 UiTcpArp::UiTcpArp(std::string _ip, int _port) :  UIservice::UiTcp( _ip, _port ) , type ( 0 )
 {
     setFd( -1 );
@@ -24,7 +26,6 @@ void UiTcpArp::setFd(int _fd)
 {
 std::cout << " void UiTcpArp::setFd(int _fd) == " << _fd << std::endl;
    MutexLocker q(mtx);
-   timeNoRead = time ( NULL );
    SKLib::Singleton<BDPthread>::getInstance().setUistate( getInfo(), _fd != -1 );
   SKLib::TCPSocketInterface::setFd( _fd);
 };
@@ -55,7 +56,7 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
 {
   int buf;
   char b [3];
-//    std:: cout << getInfo() <<isConnect() << " int (cmd.length()) == " << int (cmd.length()) << std:: endl;
+
   if ( ! isConnect() )
     return -1;
   
@@ -65,7 +66,13 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
     std:: cout << "send  error " << std:: endl;
     return -1;
   }            
-  usleep( 200000 );
+  
+  if ( ! isRecv()  ) // если через секунду нет ничего на сокете, то закрываем его 
+  {
+    close();
+    return -1;
+  };
+  
   int ret = 0;
   {
     MutexLocker q(mtx);
@@ -73,17 +80,13 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
   }
   if ( (ret < 0) )
   {
-    if ( (time (NULL) - timeNoRead) > 10 )
-    {
      std:: cout << "Read  ret ==  " << ret << " str == " << cmd  << std:: endl;
      close();
-    }
     return -1;
   }
 
 //  std:: cout << "Read  ret ==  " << ret << " str == " << cmd  << std:: endl;
 
-  timeNoRead = time (NULL); 
   /*
    std::cout << " ret == " << ret << " "<< getInfo() ;
   for ( int i = 0; i < 3 ; i++)
@@ -94,7 +97,6 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
 
   if ( ( ret != 2 ) || ( ( int (b[0]) & 0xff ) != type) )
     return -1;
- 
     
   memcpy( &buf, &(b[1]), 1 );
   if ( Inv )
@@ -103,3 +105,23 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
 //   std::cout<< "IP == " << getInfo() << " cmd = " << cmd  <<" buf == " << buf  <<std::endl;
   return buf ;
 };
+
+bool UiTcpArp::isRecv()
+{
+ fd_set rfds;
+ struct timeval tv;
+ int retval = -1 ;
+
+ FD_ZERO(&rfds);
+    /* Ждем не больше секунд. */
+ tv.tv_sec = 1;
+ tv.tv_usec = 0; 
+ FD_SET( getFd() , &rfds);
+ retval = select( getFd() + 1, &rfds, NULL, NULL, &tv);
+ /* Не полагаемся на значение tv! */
+ if ( retval < 0)
+	    throw errno;
+// 	std::cout << " retval ==   " << retval  << std::endl;
+	
+ return ( retval && FD_ISSET( getFd(), &rfds ) );
+}

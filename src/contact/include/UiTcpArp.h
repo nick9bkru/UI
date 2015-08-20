@@ -47,9 +47,9 @@ protected:
   int type; //тип модуля UI
   
 private:
+  bool isRecv();
   int answAndGet( const std::string cmd, bool Inv = true);
   Mutex mtx ;
-time_t timeNoRead;
   
 };
 
