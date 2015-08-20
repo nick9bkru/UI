@@ -1,4 +1,4 @@
-#include "tcpReciever.h"
+#include "recieveCMD/tcpReciever.h"
 
 tcpReciever::tcpReciever( const int port )
 {
@@ -7,7 +7,7 @@ tcpReciever::tcpReciever( const int port )
 
 tcpReciever::~tcpReciever()
 {
-
+  close( sockfd );
 }
 
 // Создание сокета.
@@ -60,7 +60,10 @@ int tcpReciever::recvMes( char * msg, const int len)
   tv.tv_usec = 0;
   int ret = select(sock_new + 1, &rfds, NULL, NULL, &tv);
   if ( ret < 0)
+  {
+     close( sock_new );
     throw ( std::string ( " tcpReciever::recvMes select(): " ) + std::string(strerror(errno))  ); 
+  }
   if ( ret && FD_ISSET( sock_new, &rfds ))
   {
     ret = recv(sock_new, &msg, len, 0);

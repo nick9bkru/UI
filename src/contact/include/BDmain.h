@@ -8,6 +8,7 @@
 class BDmain
 {
 public:
+  BDmain( );
   BDmain(std::string host, std::string namebd);
   ~BDmain();
   bool getInitAll( sa_info * foo );

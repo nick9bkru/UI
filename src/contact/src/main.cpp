@@ -20,7 +20,7 @@
 #include "RapsodiaSet.h"
 #include "BDmain.h"
 #include "TCPServerManage.h"
-#include "tcpReciever.h"
+#include "recieveCMD/tcpReciever.h"
 
 #include "LogSingleton.h"
 
@@ -112,6 +112,7 @@ int main(int argc, char **argv)
        db = new BDPthread("127.0.0.1", "frag_pgdb");
        db_main = new BDmain("127.0.0.1", "frag_pgdb");
        SKLib::Singleton<BDPthread>::init( db );
+       SKLib::Singleton<BDmain>::init( db_main );
      } catch ( std::string e)
      {
        std::cout << " ERROR :::: "<< e << std::endl; 
@@ -218,32 +219,38 @@ void* pthreadReceiver(void *unused)
      
      while (1)
      {
-       len = tctrecv->recvMes( (char *)&buf, sizeof(struct kg) );
-	
-      //  len = recv(sock_new, &buf, sizeof(struct kg), 0);
-      //  close(sock_new);
-	while( len > 0 )
-	{ 
-	  if (len == sizeof(struct kg))
-	  {  
-	    Log->log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
-		
-		if (buf.number >= 1 && buf.number <= 48)
-		{
-		  if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
-		  { 
-		      apparate[buf.number]->checkNewMessage(buf);
-		      apparate[buf.number]->setPrio(1);
-		  } else  
+	try
+	{
+	  len = tctrecv->recvMes( (char *)&buf, sizeof(struct kg) );
+	    
+	  //  len = recv(sock_new, &buf, sizeof(struct kg), 0);
+	  //  close(sock_new);
+	    while( len > 0 )
+	    { 
+	      if (len == sizeof(struct kg))
+	      {  
+		Log->log("!!!!!!!!!!!!!!!!! recv command !!!!!!!!!!!");
+		    
+		    if (buf.number >= 1 && buf.number <= 48)
 		    {
-			  Log->log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
-			  reSetInterfece(buf);
-		  }
-	    //  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
-		}
-		else
-	      Log->log("ERROR: buf.number = " + LexicalCaster(buf.number));
-	  }
+		      if  (buf.command!=CMD_SM_PORT) // меняем порт спец аппарата
+		      { 
+			  apparate[buf.number]->checkNewMessage(buf);
+			  apparate[buf.number]->setPrio(1);
+		      } else  
+			{
+			      Log->log("ReSet Interfece number= " + LexicalCaster(buf.number) + "!!!!!!!!!!!!!");   
+			      reSetInterfece(buf);
+		      }
+		//  prAppLst[getThreadIndexForNum(buf.number)]->add(buf.number);
+		    }
+		    else
+		  Log->log("ERROR: buf.number = " + LexicalCaster(buf.number));
+	      }
+	    }
+	}catch ( std::string e)
+	{
+	  Log->log() << "pthreadBlockKulons ERROR :::: "<< e; 
 	}
      }
      return NULL;
@@ -273,38 +280,42 @@ void* pthreadChangeKeys(void *unused)
 
      while (1)
      {
-	ret = tctrecv->recvMes( (char *) &buf, sizeof(struct kg) );
-	
-	if (ret == sizeof(struct kg))
-	{
-	      Log->log("pthreadChangeKeys: KZN=" + LexicalCaster(buf.number));
-	      Log->log(LexicalCaster(buf.number, 16) + " " + 
-	      LexicalCaster(buf.command, 16) + " " +
-	      LexicalCaster(buf.param, 16));
-	}
-	else
-	      continue;
-	// меняем действующий ключ  для ключевой зоны в таблице kzn_dkl        
-	db_main->updkzn ( buf.param, buf.number );
-	
-	//-------------------------------------------------
-	// В таблице sa_rpu DKL меняет триггер upd_dkl_sa_rpu
-	//-------------------------------------------------
-	
-	while (db_main->getNumSARPU( &num, buf.number,CHANGE_KEYS_WITHOUT_LSMENA ))
-	{
-	    if (apparate[num]->isOn)
-	    {   
-	      kdg.number = num;
-	      kdg.command = CMD_NEXT_KEY;
-	      kdg.param = buf.param;
-	      apparate[num]->checkNewMessage(kdg);
-	      apparate[num]->setPrio(1);
+       try
+       {
+	    ret = tctrecv->recvMes( (char *) &buf, sizeof(struct kg) );
+	    
+	    if (ret == sizeof(struct kg))
+	    {
+		  Log->log("pthreadChangeKeys: KZN=" + LexicalCaster(buf.number));
+		  Log->log(LexicalCaster(buf.number, 16) + " " + 
+		  LexicalCaster(buf.command, 16) + " " +
+		  LexicalCaster(buf.param, 16));
 	    }
-	    //  prAppLst[getThreadIndexForNum(num)]->add(num);
+	    else
+		  continue;
+	    // меняем действующий ключ  для ключевой зоны в таблице kzn_dkl        
+	    db_main->updkzn ( buf.param, buf.number );
+	    
+	    //-------------------------------------------------
+	    // В таблице sa_rpu DKL меняет триггер upd_dkl_sa_rpu
+	    //-------------------------------------------------
+	    
+	    while (db_main->getNumSARPU( &num, buf.number,CHANGE_KEYS_WITHOUT_LSMENA ))
+	    {
+		if (apparate[num]->isOn)
+		{   
+		  kdg.number = num;
+		  kdg.command = CMD_NEXT_KEY;
+		  kdg.param = buf.param;
+		  apparate[num]->checkNewMessage(kdg);
+		  apparate[num]->setPrio(1);
+		}
+		//  prAppLst[getThreadIndexForNum(num)]->add(num);
+	    }
+	}catch ( std::string e)
+	{
+	  Log->log() << "pthreadBlockKulons ERROR :::: "<< e; 
 	}
-
-	continue;
   
      }
      return NULL;

@@ -13,9 +13,10 @@ class tcpReciever
 {
 public:
     tcpReciever( const int port );
-    ~tcpReciever();
+    virtual ~tcpReciever();
     
     int recvMes( char * msg, const int len);
+    virtual void recvMes(){};
      int getSock( ) const;
 private:
     int sockfd;

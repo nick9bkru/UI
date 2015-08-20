@@ -58,7 +58,11 @@ ${HEADERS_DIRECTORY}/BDmain.h
 ${HEADERS_DIRECTORY}/kulon.h
 ${HEADERS_DIRECTORY}/serdolik.h
 ${HEADERS_DIRECTORY}/UiTcpArp.h
-${HEADERS_DIRECTORY}/tcpReciever.h
+${HEADERS_DIRECTORY}/recieveCMD/tcpReciever.h
+${HEADERS_DIRECTORY}/recieveCMD/ChangeKeyClass.h
+${HEADERS_DIRECTORY}/recieveCMD/ReceiveCmd.h
+${HEADERS_DIRECTORY}/recieveCMD/BlockKulons.h
+${HEADERS_DIRECTORY}/recieveCMD/RecieverFromCUU.h
 )
 ##############################################
 set(SOURCES
@@ -70,7 +74,11 @@ ${SOURCES_DIRECTORY}/BDmain.cpp
 ${SOURCES_DIRECTORY}/kulon.cpp
 ${SOURCES_DIRECTORY}/serdolik.cpp
 ${SOURCES_DIRECTORY}/UiTcpArp.cpp
-${SOURCES_DIRECTORY}/tcpReciever.cpp
+${SOURCES_DIRECTORY}/recieveCMD/tcpReciever.cpp
+${SOURCES_DIRECTORY}/recieveCMD/ChangeKeyClass.cpp
+${SOURCES_DIRECTORY}/recieveCMD/ReceiveCmd.cpp
+${SOURCES_DIRECTORY}/recieveCMD/BlockKulons.cpp
+${SOURCES_DIRECTORY}/recieveCMD/RecieverFromCUU.cpp
 )
 ###############################################
 #Включение в зависимости только h-ов, чтобы при 

@@ -1,5 +1,11 @@
 #include "BDmain.h"
 
+
+BDmain::BDmain()
+{
+  throw (std::string ("Using BDmain::BDmain(), it's very very bad"));
+}; //для синглтона
+
 BDmain::BDmain(std::string host, std::string namebd)
 {
   std::cout<< "BDmain::BDmain ip ==" << host << " name =" << namebd  << std::endl;
