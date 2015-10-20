@@ -16,8 +16,10 @@ UiTcpArp::~UiTcpArp()
 int UiTcpArp::close(  )
 {
   std::cout << "UiTcpArp::close(  ) getInfo  " << getInfo()  << std::endl;
-  MutexLocker q(mtx);
-  return SKLib::TCPSocketInterface::close();
+  if ( isConnect() )
+   ::close(getFd());
+   setFd(-1);
+  return 1;
   
 };
 
@@ -27,13 +29,16 @@ void UiTcpArp::setFd(int _fd)
 std::cout << " void UiTcpArp::setFd(int _fd) == " << _fd << std::endl;
    MutexLocker q(mtx);
    SKLib::Singleton<BDPthread>::getInstance().setUistate( getInfo(), _fd != -1 );
-  SKLib::TCPSocketInterface::setFd( _fd);
+  fd= _fd;
 };
 
 bool UiTcpArp::setState(unsigned char state)
 {
   std::ostringstream querry;
-  querry << "set" <<  int(state) << "\r";
+  querry << "set" <<  char(state) << "\r";
+// querry << "set1" << "\r";
+  //std::cout << querry.str()  << std::endl;
+  
   return (answAndGet ( querry.str() ) != -1 );
 };
 
@@ -57,10 +62,12 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
   int buf;
   char b [3];
 
+//    std:: cout << "isConnect =  " << isConnect() << " ip = " <<getInfo()  << std:: endl;
+
   if ( ! isConnect() )
     return -1;
-  
-  if ( onlySend (cmd)  != int (cmd.length()) )
+//std::cout << cmd << std::endl;  
+  if ( (onlySend (cmd)  != int (cmd.length())) &&  (onlySend (cmd)  != int (cmd.length())) )
   {
      close();
     std:: cout << "send  error " << std:: endl;
@@ -69,10 +76,10 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
   
   if ( ! isRecv()  ) // если через секунду нет ничего на сокете, то закрываем его 
   {
+      std:: cout << " recv " << std:: endl;
     close();
     return -1;
   };
-  
   int ret = 0;
   {
     MutexLocker q(mtx);
@@ -81,7 +88,7 @@ int UiTcpArp::answAndGet( const std::string cmd, bool Inv)
   if ( (ret < 0) )
   {
      std:: cout << "Read  ret ==  " << ret << " str == " << cmd  << std:: endl;
-     close();
+//     close();
     return -1;
   }
 
@@ -114,7 +121,7 @@ bool UiTcpArp::isRecv()
 
  FD_ZERO(&rfds);
     /* Ждем не больше секунд. */
- tv.tv_sec = 1;
+ tv.tv_sec = 5;
  tv.tv_usec = 0; 
  FD_SET( getFd() , &rfds);
  retval = select( getFd() + 1, &rfds, NULL, NULL, &tv);
@@ -122,6 +129,6 @@ bool UiTcpArp::isRecv()
  if ( retval < 0)
 	    throw errno;
 // 	std::cout << " retval ==   " << retval  << std::endl;
-	
  return ( retval && FD_ISSET( getFd(), &rfds ) );
 }
+

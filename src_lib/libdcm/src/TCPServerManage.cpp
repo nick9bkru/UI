@@ -39,14 +39,17 @@ void TCPServerManage::start()
     FD_ZERO(&rfds);
     FD_SET(sockfd, &rfds);    
     retval = select(sockfd + 1, &rfds, NULL, NULL, &tv);
+//    Log->log() << "void TCPServerManage::start()" ;
     if (! ( retval &&  FD_ISSET( sockfd, &rfds )) )
     {
+      usleep ( 100000 );
       continue;
+      
     };
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
     if ( new_fd != -1)
     {
-      Log->log() << " Connect new UI!!! === " << inet_ntoa (their_addr.sin_addr) << " !!!";      Log->log() << " Connect new UI!!! === " << inet_ntoa (their_addr.sin_addr) << " !!!";
+      Log->log() << " Connect new UI!!! === " << inet_ntoa (their_addr.sin_addr) << " !!!";  
       connect( new_fd, std::string (inet_ntoa (their_addr.sin_addr)));
     };
 //     std::cout << " !!! === " << strerror(errno) << " !!!" << std::endl;

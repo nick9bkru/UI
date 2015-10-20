@@ -16,19 +16,31 @@ UiTcp::~UiTcp()
 int UiTcp::close(  )
 {
   std::cout << "UiTcp::close(  ) getInfo  " << getInfo()  << std::endl;
-  MutexLocker q(mtx);
   setUiOn(  );
-  return SKLib::TCPSocketInterface::close();
+  if ( isConnect() )
+  {
+    MutexLocker q(mtx);
+   ::close(getFd());
+   }
+   setFd(-1);
+
+  return 1;
   
 };
 
 int UiTcp::open(  )
 {
-  setUiOn( true );
+  bool ret = false;
+  
   gettimeofday(&timeLastAsk, NULL);;
   timeLastAsk.tv_sec--;
-  MutexLocker q(mtx);
-  return ( SKLib::TCPSocketInterface::open( getInfo() ) && resetLastAnsw ());
+  if ( SKLib::TCPSocketInterface::open( getInfo() ) ) 
+  {
+     ret = true;
+     setUiOn( true );
+     resetLastAnsw ();
+  }
+  return ret;
   
 };
 
@@ -124,10 +136,12 @@ bool UiTcp::recieveState()
 
 void UiTcp::setFd(int _fd)
 {
-  setUiOn( true );
+//  Log << getInfo() << " :: UiTcp::setFd fd == " << _fd;
+  setUiOn( _fd != -1 );
   gettimeofday(&timeLastAsk, NULL);;
   timeLastAsk.tv_sec--;
    resetLastAnsw ();
    MutexLocker q(mtx);
-  SKLib::TCPSocketInterface::setFd( _fd);
+   fd = _fd;
+//  SKLib::TCPSocketInterface::setFd( _fd);
 };

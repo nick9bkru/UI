@@ -3,6 +3,11 @@
 kulon::kulon(struct sa_info _cfg, SKLib::DataInterface * _iface) : Apparate(_cfg), iface (_iface)
 {
   init_pk();
+  errState.insert ( 0x0001 );
+  errState.insert ( 0x0100 );
+  errState.insert ( 0x0000 );
+  errState.insert ( 0x003f );
+  errState.insert ( 0x007f );
 }
 
 kulon::~kulon()
@@ -90,6 +95,8 @@ ushort  kulon::answerKulon()
    
      // посылаем строку s1 три раза с паузой 50 миллисекунд, ответ записываем в buffer
      ret = iface->getAnswerForCommand_new( s1, buffer, 9);
+//     if ( cfg.num >= 33  &&  cfg.num <= 35 ) 
+//       log1( buffer );
      // ошибка при приеме информации от Кулона  и не было ошибки ранее. опрашиваем устройство еще раз
      if( (ret<9) && (ioBuf[IN] != 0) )
      {    log1("getAnswerForCommand  ret=" + LexicalCaster(ret) + "  ErrMsg=" + iface->getErrMsg()) ;  
@@ -108,7 +115,9 @@ ushort  kulon::answerKulon()
     	    //+ string(buffer) + "==!!!!");
     	  ret = 0;
         }
-      return ( ret==9 ? private2app_Kulon( toUshortKulon(buffer)) : 0);
+        const int val = toUshortKulon(buffer) ;
+        
+      return ( ( ret==9 && isValidState ( val ) ) ? private2app_Kulon( val ) : 0);
 }
 
 int kulon::sendReceiveKulon()
@@ -152,7 +161,9 @@ int kulon::sendReceiveKulon()
 }
 
 ushort  kulon::private2app_Kulon( ushort  sost) const
-{  ushort  app_s;
+{  
+//    log1( LexicalCaster(sost ));
+    ushort  app_s;
     app_s = private2app( sost, 0 );
     if ( (sost & inds[3][5])==0)  // нет К2
      app_s  |= IND_PUSTK1;         // установить К1
@@ -195,7 +206,7 @@ void kulon::init_pk()
 bool kulon::isReadyToConnect()
 {
      bool ok = false;
-     
+Log->log()<< "isReady =" << KONF;     
      if (KONF != 1)
       return ok;
 
@@ -274,3 +285,10 @@ void kulon::setDataInterface(SKLib::DataInterface * _iface)
      iface = _iface;
 };
 
+bool kulon::isValidState( const int & val) //const 
+{
+ bool ret = false; 
+// Log->log() << " isValidState ====== " << val; 
+ ret =  errState.find ( val ) == errState.end();
+ return  ret ;
+} ;

@@ -88,13 +88,16 @@ int main(int argc, char **argv)
   setSignal();
   // цепляемся к БД
   std::auto_ptr< Database > db ( new Database( "127.0.0.1","frag_pgdb" )  ); ///< Указатель на объект, связанный с БД.
-  if ( !db->isReady() )   
+  while ( !db->isReady() )
   {
     Log->log("Error !! Database not started !!");
-    exit(-1);
+    sleep (1);
+    db.reset ( new Database( "127.0.0.1","frag_pgdb" ) );
   }
   Log->log("Database is start!!");
-  
+//  Log->log("Sleeep  5 sec .... ");
+  //поставил задержку 
+//  sleep (5);
   try
   {
       TcpMng = new UIservice::TCPServerManage(4001);

@@ -2,6 +2,7 @@
 #define KULON_H
 
 #include "apparate.h"
+#include <set>
 
 class kulon :  public Apparate
 {
@@ -62,6 +63,17 @@ private:
      */
      virtual void commandBlock(ushort p) ;
     virtual void init_pk() ;
+    
+    
+    /**
+     \brief проверяем валидное ли состояние аппарата 
+    */
+    virtual bool isValidState( const int & val)  ;
+    
+    /**
+     \brief набор всех ошибок ( выбрал set быстрого поиска) 
+    */
+    std::set < int > errState;
     };
 
 #endif // KULON_H

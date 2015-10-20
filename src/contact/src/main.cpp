@@ -103,7 +103,7 @@ int main(int argc, char **argv)
       daemon(0, 0);
      mainThreadPid = getpid();
      
-     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance( "/tmp/qwe.log");
+     SKLib::Log *Log =  &SKLib::LogSingleton::getInstance( "/tmp/contact.log");
      
      Log->setDebugMode(argc > 1 ? SKLib::Log::DebugToUserScreen : SKLib::Log::DebugToFile);
      try 
@@ -178,18 +178,18 @@ int main(int argc, char **argv)
 
      int *n;
 //Kulon     
-     for ( int i = 0 ; i < 6 ; i ++ )
+     for ( int i = 0 ; i < 4 ; i ++ )
      {
        n = new int (i);
        pthread_create(&pthread_np[*n], NULL, pthreadNPort, n);
      };
 //ARPU
-     /*
+     
      for ( int i = 41 ; i < 49 ; i ++ )
      {
        n = new int (i);
        pthread_create(&pthread_ARPU[*n], NULL, pthreadARPU, n);
-     }; */   
+     };    
      TcpManage->start();
      
      return 0;
@@ -427,7 +427,7 @@ void* pthreadARPU (void * _arg)
   for (;;)
   {
    apparate[n]->update_prio(0); 
-   usleep(1);
+   usleep( 100000 );
   }
   return NULL;
 }

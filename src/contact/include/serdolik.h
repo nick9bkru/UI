@@ -54,6 +54,11 @@ private:
      */
      virtual void commandBlock(ushort p);
      virtual void init_pk() ;
+     
+    /**
+     \brief проверяем валидное ли состояние аппарата 
+    */
+    virtual bool isValidState( const int & val)  ;
 };
 
 #endif // SERDOLIK_H

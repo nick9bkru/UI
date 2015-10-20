@@ -207,6 +207,11 @@ protected:
  
     SKLib::Log *Log ;
     BDPthread *db;
+    
+    /**
+     \brief проверяем валидное ли состояние аппарата 
+    */
+    virtual bool isValidState( const int & val) = 0 ;
 public:
 
      /**

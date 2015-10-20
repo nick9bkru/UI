@@ -42,7 +42,7 @@ bool BDPthread::Init( ushort * foo, const ushort num )
   query << "select DKL, KZN, KONF, LSMENA from SA_RPU where NUM= " << num << " ;";
   
     pthread_mutex_lock(&dbMutex);
-   bool ok = db->singleSelect(query.str(), &foo, 4*sizeof(ushort));
+   bool ok = db->singleSelect(query.str(), foo, 4*sizeof(ushort));
    pthread_mutex_unlock(&dbMutex);
    return ok;
 }

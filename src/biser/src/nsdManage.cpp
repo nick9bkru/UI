@@ -65,7 +65,7 @@ void nsdManage::start ()
       }
      };
      selectAll (); // смотри не пришло ли чего от контактов
-     
+     usleep(10000);
   };  
 };
 

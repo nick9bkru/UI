@@ -8,6 +8,7 @@ DcmUps::DcmUps( std::string _ip, int _port,BDStateUps* _BDst ) : UiTcp (_ip,  _p
   Log->log()  << "Constructor DcmUps::DcmUps _ip==  " << _ip << " port ==" << _port ;
   setLastState( );
   type = typeUI;
+setUiOn ( false ); 
 }
 
 DcmUps::~DcmUps()

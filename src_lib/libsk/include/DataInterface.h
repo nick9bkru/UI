@@ -45,12 +45,13 @@ namespace SKLib
 	  void setAnswerSize(int _answerSize);
 	  
      protected:
-	  void setFd(int _fd);
+	  virtual void setFd(int _fd);
 	  void setErrMsg(std::string _errMsg);
 	  Log * log;
+	   int fd; // file descriptor.
+	 
      private:
 	  int timeout; // in microseconds.
-	  int fd; // file descriptor.
 	  int answerSize;
 	  std::string errMsg;
      };

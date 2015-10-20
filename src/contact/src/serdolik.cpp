@@ -30,7 +30,7 @@ int serdolik::update()
      ushort nval = 0, need_update = 0;
      char buffer[RCVBUF_SIZE];
      std::ostringstream os;
-
+//log1( " update " );
      strcpy(buffer, "");
 
      // Смена ключей.
@@ -41,6 +41,7 @@ int serdolik::update()
      // не Кулон ----------------------
 	  if (ioSendBuf != ioBuf[OUT])
 	  {
+//	  Log-> log () << "set == "<<  app2private(ioSendBuf, 1);
  	     ifaceDcm->setState(app2private(ioSendBuf, 1));
 	    
 	    
@@ -83,11 +84,13 @@ int serdolik::update()
 		}
 		  
 		// Сохраняем старое и новое состояние.
-		if (ioBuf[j] != nval)
+//		std::cout << " !!!!!!!!!!!!!! " << state_buf ; 
+		if (ioBuf[j] != nval && isValidState ( state_buf ) )
 		{
-		  ioBufOld[j] = ioBuf[j];
-		  ioBuf[j] = nval;
-		  need_update++;
+		      //Log->log () << state_buf;
+    		      ioBufOld[j] = ioBuf[j];
+		      ioBuf[j] = nval;
+		      need_update++;
 		}
 	  }
       // конец   else  не Кулон ------------------------
@@ -183,3 +186,9 @@ void serdolik::commandBlock(ushort p)
      sendCuuChanges();
 };
 
+
+bool serdolik::isValidState( const int & val)// const
+{
+ //Log->log() << "   serdolik::isValidState == " << val;
+ return  ( val < 0x38 );
+} ;

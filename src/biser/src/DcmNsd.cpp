@@ -7,6 +7,7 @@ DcmNsd::DcmNsd(std::string _ip, int _port , BDStateNsd* _BDst): UiTcp (_ip,  _po
   Log->log() << "Constructor DcmNsd::DcmNsd maskPin==  " << maskPin << " lastState ==" << lastState ;
   
   type = typeUI;
+  setUiOn ( false ); 
 }
 
 DcmNsd::~DcmNsd()

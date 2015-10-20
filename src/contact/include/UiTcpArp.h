@@ -50,6 +50,7 @@ private:
   bool isRecv();
   int answAndGet( const std::string cmd, bool Inv = true);
   Mutex mtx ;
+  int count_err ;
   
 };
 
